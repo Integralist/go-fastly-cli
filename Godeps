@@ -1,0 +1,4 @@
+github.com/fatih/color v1.4.1
+github.com/mitchellh/gox c9740af9c6574448fd48eb30a71f964014c7a837
+github.com/sethvargo/go-fastly 2fa51b1ddf450674748f1e9a8dd2ac5c065b45ac
+github.com/sirupsen/logrus 10f801ebc38b33738c9d17d50860f484a0988ff5
