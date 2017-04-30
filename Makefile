@@ -26,7 +26,15 @@ build: copy_vim_files
 	@docker build -t $(container_env) .
 
 dev: build remove_vim_files
-	@docker run -it -v "$$(pwd)":/go/src $(container_env) /bin/bash
+	@docker run -it \
+		-v "$$(pwd)":/go/src \
+		-v "${VCL_DIRECTORY}":${VCL_DIRECTORY} \
+		-e FASTLY_API_TOKEN="${FASTLY_API_TOKEN}" \
+		-e FASTLY_SERVICE_ID="${FASTLY_SERVICE_ID}" \
+		-e VCL_DIRECTORY="${VCL_DIRECTORY}" \
+		-e VCL_MATCH_DIRECTORY="${VCL_MATCH_DIRECTORY}" \
+		-e VCL_SKIP_DIRECTORY="${VCL_SKIP_DIRECTORY}" \
+		$(container_env) /bin/bash
 
 rebuild: clean run
 
