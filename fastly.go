@@ -1,6 +1,7 @@
 package main
 
 import (
+	"commands"
 	"flag"
 	"flags"
 	"fmt"
@@ -9,8 +10,8 @@ import (
 	"github.com/sirupsen/logrus"
 )
 
-// AppVersion is the application version
-const AppVersion = "0.0.1"
+// appVersion is the application version
+const appVersion = "0.0.1"
 
 var logger *logrus.Entry
 
@@ -25,17 +26,17 @@ func init() {
 func main() {
 	f := flags.New()
 
-	if *f.Help == true {
+	if *f.Top.Help == true {
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
 
-	if *f.Version == true {
-		fmt.Println(AppVersion)
+	if *f.Top.Version == true {
+		fmt.Println(appVersion)
 		os.Exit(1)
 	}
 
-	if *f.Debug == true {
+	if *f.Top.Debug == true {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 
@@ -46,9 +47,11 @@ func main() {
 
 	switch arg {
 	case "diff":
-		f.Diff.Parse(args[counter:])
+		f.Top.Diff.Parse(args[counter:])
+		commands.Diff(f)
 	case "upload":
-		f.Upload.Parse(args[counter:])
+		f.Top.Upload.Parse(args[counter:])
+		commands.Upload(f)
 	default:
 		fmt.Printf("%v is not valid command.\n", arg)
 		os.Exit(1)

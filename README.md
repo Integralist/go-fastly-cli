@@ -1,6 +1,8 @@
 # go-fastly-cli
 
-> CLI tool for uploading and diffing local/remote Fastly VCL
+CLI tool for uploading and diffing local/remote Fastly VCL
+
+> Note: this supersedes the individual tools: [ero](https://github.com/Integralist/ero) and [lataa](https://github.com/Integralist/lataa)
 
 ## Install
 
@@ -114,3 +116,10 @@ To remove all compiled binaries, vim files and containers:
 ```bash
 make clean
 ```
+
+## TODO
+
+* Test Suite
+* Ability to diff two remote services (not just local against a remote)
+* Ability to upload an individual file (not just pattern matched list of files)
+* Code Refactoring

@@ -23,9 +23,22 @@ type TopLevelFlags struct {
 	Diff, Upload                           *flag.FlagSet
 }
 
+// SubCommandFlags defines the settings for the subcommands
+type SubCommandFlags struct {
+	VclVersion       *string
+	UseLatestVersion *bool
+	GetLatestVersion *bool
+	GetSettings      *string
+	CloneVersion     *string
+	UploadVersion    *string
+	ActivateVersion  *string
+	GetVersionStatus *string
+}
+
 // Flags defines type of structure returned to user
 type Flags struct {
-	TopLevelFlags
+	Top TopLevelFlags
+	Sub SubCommandFlags
 }
 
 // New returns defined flags
@@ -45,29 +58,28 @@ func New() Flags {
 
 	flag.Parse()
 
-	subCommands(topLevelFlags)
-
 	return Flags{
-		topLevelFlags,
+		Top: topLevelFlags,
+		Sub: subCommands(topLevelFlags),
 	}
 }
 
-func subCommands(t TopLevelFlags) {
-	// TODO: might need to expose these flags in order to use their logic?
-	// meaning main package might need to pass instance/data around?
-	t.Diff.String("vcl-version", "", "specify Fastly service 'version' to verify against")
-	t.Upload.Bool("use-latest-version", false, "use latest Fastly service version to upload to (presumes not activated)")
-	t.Upload.Bool("get-latest-version", false, "get latest Fastly service version and its active status")
-	t.Upload.String("get-settings", "", "get settings (Default TTL & Host) for specified Fastly service version (version number or latest)")
-	t.Upload.String("clone-version", "", "specify Fastly service 'version' to clone from before uploading to")
-	t.Upload.String("upload-version", "", "specify non-active Fastly service 'version' to upload to")
-	t.Upload.String("activate-version", "", "specify Fastly service 'version' to activate")
-	t.Upload.String("get-version-status", "", "retrieve status for the specified Fastly service 'version'")
+func subCommands(t TopLevelFlags) SubCommandFlags {
+	return SubCommandFlags{
+		VclVersion:       t.Diff.String("vcl-version", "", "specify Fastly service 'version' to verify against"),
+		UseLatestVersion: t.Upload.Bool("use-latest-version", false, "use latest Fastly service version to upload to (presumes not activated)"),
+		GetLatestVersion: t.Upload.Bool("get-latest-version", false, "get latest Fastly service version and its active status"),
+		GetSettings:      t.Upload.String("get-settings", "", "get settings (Default TTL & Host) for specified Fastly service version (version number or latest)"),
+		CloneVersion:     t.Upload.String("clone-version", "", "specify Fastly service 'version' to clone from before uploading to"),
+		UploadVersion:    t.Upload.String("upload-version", "", "specify non-active Fastly service 'version' to upload to"),
+		ActivateVersion:  t.Upload.String("activate-version", "", "specify Fastly service 'version' to activate"),
+		GetVersionStatus: t.Upload.String("get-version-status", "", "retrieve status for the specified Fastly service 'version'"),
+	}
 }
 
 // Check determines if a flag was specified before the subcommand
-// Then returns the subcommand argument value based on the correct index
-// Followed by the index of where the subcommand's flags start in the args list
+// then returns the subcommand argument value based on the correct index
+// followed by the index of where the subcommand's flags start in the args list
 func Check(args []string) (string, int) {
 	counter := 0
 	subcommandSeen := false
