@@ -25,6 +25,8 @@ Flags:
 ```bash
 fastly -help
 
+  -activate string
+        specify Fastly service 'version' to activate
   -debug
         show any error/diff output + debug logs
   -dir string
@@ -61,8 +63,6 @@ Upload Options:
 fastly upload -help
 
 Usage of upload:
-  -activate string
-        specify Fastly service 'version' to activate
   -clone string
         specify Fastly service 'version' to clone from before uploading to
   -get-latest
@@ -123,13 +123,16 @@ make clean
 # view status for the specified service version
 fastly -status 123
 
+# activate specified service version
+fastly -activate 123
+
 # diff local version against lastest remote version
 fastly diff
 
 # diff local version against specific remote version
 fastly diff -version 123
 
-# activate debug mode
+# enable debug mode
 # this will mean debug logs are displayed
 # for 'diff' this will mean diff output is displayed as well
 fastly -debug diff -version 123
@@ -146,9 +149,6 @@ fastly upload -version 123
 
 # token and service explicitly set
 fastly -service xxx -token xxx upload -version 123
-
-# activate service
-fastly upload -activate 123
 ```
 
 ## TODO

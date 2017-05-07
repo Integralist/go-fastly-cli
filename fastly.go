@@ -64,6 +64,11 @@ func main() {
 		return
 	}
 
+	if *f.Top.Activate != "" {
+		activateVersion(f, client)
+		return
+	}
+
 	logger.Debug("application starting")
 
 	args := os.Args[1:] // strip first arg `fastly`
@@ -80,6 +85,24 @@ func main() {
 		fmt.Printf("%v is not valid command.\n", arg)
 		os.Exit(1)
 	}
+}
+
+func activateVersion(f flags.Flags, client *fastly.Client) {
+	v, err := strconv.Atoi(*f.Top.Activate)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	_, err = client.ActivateVersion(&fastly.ActivateVersionInput{
+		Service: *f.Top.Service,
+		Version: v,
+	})
+	if err != nil {
+		fmt.Printf("\nThere was a problem activating version %s\n\n%s", yellow(*f.Top.Activate), red(err))
+		os.Exit(1)
+	}
+	fmt.Printf("\nService '%s' now has version '%s' activated\n\n", yellow(*f.Top.Service), green(*f.Top.Activate))
 }
 
 func getStatusVersion(serviceVersion, statusVersion string, client *fastly.Client) (string, error) {

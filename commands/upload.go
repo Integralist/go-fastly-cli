@@ -43,12 +43,6 @@ func Upload(f flags.Flags, client *fastly.Client) {
 		return
 	}
 
-	// activate the specified fastly service version
-	if *f.Sub.ActivateVersion != "" {
-		activateVersion(f, client)
-		return
-	}
-
 	// the acquireVersion function checks if we should...
 	//
 	// 		A. clone the specified version before uploading files: `-clone-version`
@@ -112,24 +106,6 @@ func printSettingsFor(serviceVersion string, client *fastly.Client) {
 		settings.DefaultHost,
 		settings.DefaultTTL,
 	)
-}
-
-func activateVersion(f flags.Flags, client *fastly.Client) {
-	v, err := strconv.Atoi(*f.Sub.ActivateVersion)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	_, err = client.ActivateVersion(&fastly.ActivateVersionInput{
-		Service: fastlyServiceID,
-		Version: v,
-	})
-	if err != nil {
-		fmt.Printf("\nThere was a problem activating version %s\n\n%s", yellow(*f.Sub.ActivateVersion), red(err))
-		os.Exit(1)
-	}
-	fmt.Printf("\nService '%s' now has version '%s' activated\n\n", yellow(fastlyServiceID), green(*f.Sub.ActivateVersion))
 }
 
 // TODO: duplicated in main package
