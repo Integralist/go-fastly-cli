@@ -37,6 +37,8 @@ fastly -help
         your service id (fallback: FASTLY_SERVICE_ID) 
   -skip string
         regex for skipping vcl directories (will also try: VCL_SKIP_DIRECTORY) 
+  -status string
+        retrieve status for the specified Fastly service 'version'
   -token string
         your fastly api token (fallback: FASTLY_API_TOKEN) 
   -version
@@ -67,8 +69,6 @@ Usage of upload:
         get latest Fastly service version and its active status
   -settings string
         get settings (Default TTL & Host) for specified Fastly service version (version number or latest)
-  -status string
-        retrieve status for the specified Fastly service 'version'
   -version string
         specify non-active Fastly service 'version' to upload to
   -use-latest
@@ -120,6 +120,9 @@ make clean
 ## Examples
 
 ```bash
+# view status for the specified service version
+fastly -status 123
+
 # diff local version against lastest remote version
 fastly diff
 
@@ -133,9 +136,6 @@ fastly -debug diff -version 123
 
 # view latest service version
 fastly upload -get-latest
-
-# view status for the specified service version
-fastly upload -status
 
 # view service settings
 fastly upload -settings 123

@@ -18,15 +18,9 @@ var green = color.New(color.FgGreen).SprintFunc()
 
 // Upload takes specified list of files and creates new remote version
 // if upload fails it'll attempt uploading over existing remote version
-func Upload(f flags.Flags) {
+func Upload(f flags.Flags, client *fastly.Client) {
 	checkIncorrectFlagConfiguration(f)
 	configureSkipMatch(f)
-
-	client, err := fastly.NewClient(*f.Top.Token)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 
 	// store value rather than dereference pointer multiple times later
 	fastlyServiceID = *f.Top.Service
@@ -52,17 +46,6 @@ func Upload(f flags.Flags) {
 	// activate the specified fastly service version
 	if *f.Sub.ActivateVersion != "" {
 		activateVersion(f, client)
-		return
-	}
-
-	// print the status of the specified fastly service version
-	if *f.Sub.GetVersionStatus != "" {
-		status, err := getStatusVersion(*f.Sub.GetVersionStatus, client)
-		if err != nil {
-			fmt.Printf("\nThere was a problem getting the status for version %s\n\n%s\n\n", yellow(*f.Sub.GetVersionStatus), red(err))
-			os.Exit(1)
-		}
-		fmt.Printf("\nService '%s' version '%s' is '%s'\n\n", yellow(fastlyServiceID), yellow(*f.Sub.GetVersionStatus), status)
 		return
 	}
 
@@ -149,6 +132,7 @@ func activateVersion(f flags.Flags, client *fastly.Client) {
 	fmt.Printf("\nService '%s' now has version '%s' activated\n\n", yellow(fastlyServiceID), green(*f.Sub.ActivateVersion))
 }
 
+// TODO: duplicated in main package
 func getStatusVersion(statusVersion string, client *fastly.Client) (string, error) {
 	v, err := strconv.Atoi(statusVersion)
 	if err != nil {

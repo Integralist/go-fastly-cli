@@ -14,14 +14,8 @@ import (
 )
 
 // Diff compares local VCL to the specificed remote service vcl version
-func Diff(f flags.Flags) {
+func Diff(f flags.Flags, client *fastly.Client) {
 	configureSkipMatch(f)
-
-	client, err := fastly.NewClient(*f.Top.Token)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
 
 	// store value rather than dereference pointer multiple times later
 	fastlyServiceID = *f.Top.Service

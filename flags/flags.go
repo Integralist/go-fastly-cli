@@ -18,9 +18,9 @@ func init() {
 
 // TopLevelFlags defines the common settings across all commands
 type TopLevelFlags struct {
-	Help, Debug, Version                   *bool
-	Token, Service, Directory, Match, Skip *string
-	Diff, Upload                           *flag.FlagSet
+	Help, Debug, Version                           *bool
+	Token, Service, Directory, Match, Skip, Status *string
+	Diff, Upload                                   *flag.FlagSet
 }
 
 // SubCommandFlags defines the settings for the subcommands
@@ -52,6 +52,7 @@ func New() Flags {
 		Directory: flag.String("dir", os.Getenv("VCL_DIRECTORY"), "vcl directory to compare files against"),
 		Match:     flag.String("match", "", "regex for matching vcl directories (will also try: VCL_MATCH_DIRECTORY)"),
 		Skip:      flag.String("skip", "^____", "regex for skipping vcl directories (will also try: VCL_SKIP_DIRECTORY)"),
+		Status:    flag.String("status", "", "retrieve status for the specified Fastly service 'version'"),
 		Diff:      flag.NewFlagSet("diff", flag.ExitOnError),
 		Upload:    flag.NewFlagSet("upload", flag.ExitOnError),
 	}
@@ -73,7 +74,6 @@ func subCommands(t TopLevelFlags) SubCommandFlags {
 		CloneVersion:     t.Upload.String("clone", "", "specify Fastly service 'version' to clone from before uploading to"),
 		UploadVersion:    t.Upload.String("version", "", "specify non-active Fastly service 'version' to upload to"),
 		ActivateVersion:  t.Upload.String("activate", "", "specify Fastly service 'version' to activate"),
-		GetVersionStatus: t.Upload.String("status", "", "retrieve status for the specified Fastly service 'version'"),
 	}
 }
 
