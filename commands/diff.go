@@ -26,16 +26,17 @@ func Diff(f flags.Flags) {
 	// store value rather than dereference pointer multiple times later
 	fastlyServiceID = *f.Top.Service
 
-	latestVersion, err := getLatestVCLVersion(client)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	selectedVersion := latestVersion
+	var selectedVersion string
 
 	if *f.Sub.VclVersion != "" {
 		selectedVersion = *f.Sub.VclVersion
+	} else {
+		latestVersion, err := getLatestVCLVersion(client)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		selectedVersion = latestVersion
 	}
 
 	processFiles(selectedVersion, getVCL, processDiff, f, client)
