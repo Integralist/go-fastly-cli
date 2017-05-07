@@ -350,7 +350,7 @@ func getLatestServiceVersion(client *fastly.Client) (string, string, error) {
 
 func handleResponse(vr vclResponse, debug bool, selectedVersion string) {
 	if vr.Error {
-		fmt.Printf("Whoops, the file '%s' didn't upload to version '%s' because of the following error:\n\t%s\n", yellow(vr.Name), selectedVersion, red(vr.Content))
+		fmt.Printf("Whoops, the file '%s' didn't upload to version '%s' because of the following error:\n\t%s\n\n", yellow(vr.Name), selectedVersion, red(vr.Content))
 	} else {
 		fmt.Printf("Yay, the file '%s' in version '%s' was updated successfully\n", green(vr.Name), yellow(selectedVersion))
 	}

@@ -32,12 +32,10 @@ func Diff(f flags.Flags) {
 		os.Exit(1)
 	}
 
-	var selectedVersion string
+	selectedVersion := latestVersion
 
 	if *f.Sub.VclVersion != "" {
 		selectedVersion = *f.Sub.VclVersion
-	} else {
-		selectedVersion = latestVersion
 	}
 
 	processFiles(selectedVersion, getVCL, processDiff, f, client)
