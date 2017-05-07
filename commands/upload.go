@@ -31,28 +31,31 @@ func Upload(f flags.Flags) {
 	// store value rather than dereference pointer multiple times later
 	fastlyServiceID = *f.Top.Service
 
+	// print latest host settings for the specified fastly service
 	if *f.Sub.GetSettings == "latest" {
 		printLatestSettings(client)
 		return
 	}
 
+	// print host settings for the provided version of specified fastly service
 	if *f.Sub.GetSettings != "" {
 		printSettingsFor(*f.Sub.GetSettings, client)
 		return
 	}
 
+	// print latest service version and its status
 	if *f.Sub.GetLatestVersion {
 		printLatestServiceVersion(client)
 		return
 	}
 
-	// activate version
+	// activate the specified fastly service version
 	if *f.Sub.ActivateVersion != "" {
 		activateVersion(f, client)
 		return
 	}
 
-	// version status check
+	// print the status of the specified fastly service version
 	if *f.Sub.GetVersionStatus != "" {
 		status, err := getStatusVersion(*f.Sub.GetVersionStatus, client)
 		if err != nil {
@@ -63,88 +66,19 @@ func Upload(f flags.Flags) {
 		return
 	}
 
-	// check if we should...
+	// the acquireVersion function checks if we should...
+	//
 	// 		A. clone the specified version before uploading files: `-clone-version`
 	// 		B. upload files to the specified version: `-upload-version`
 	// 		C. upload files to the latest version: `-use-latest-version`
 	// 		D. clone the latest version if it's already activated
-
-	// clone from specified version and upload to that
-	if *f.Sub.CloneVersion != "" {
-		clonedVersion, err := cloneFromVersion(*f.Sub.CloneVersion, client)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		fmt.Printf("Successfully created new version %d from existing version %s\n\n", clonedVersion.Number, *f.Sub.CloneVersion)
-		selectedVersion = strconv.Itoa(clonedVersion.Number)
-	} else if *f.Sub.UploadVersion != "" {
-		// upload to the specified version (it can't be activated)
-
-		v, err := strconv.Atoi(*f.Sub.UploadVersion)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		getVersion, err := client.GetVersion(&fastly.GetVersionInput{
-			Service: fastlyServiceID,
-			Version: v,
-		})
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-		if getVersion.Active {
-			fmt.Println("Sorry, the specified version is already activated")
-			os.Exit(1)
-		}
-		selectedVersion = *f.Sub.UploadVersion
-	} else {
-		// upload to the latest version (it can't be activated)
-
-		latestVersion, err := getLatestVCLVersion(client)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		selectedVersion = latestVersion
-
-		v, err := strconv.Atoi(latestVersion)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		if *f.Sub.UseLatestVersion {
-			getVersion, err := client.GetVersion(&fastly.GetVersionInput{
-				Service: fastlyServiceID,
-				Version: v,
-			})
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-			if getVersion.Active {
-				fmt.Println("Sorry, the latest version is already activated")
-				os.Exit(1)
-			}
-			selectedVersion = latestVersion
-		} else {
-			// otherwise clone the latest version and upload to that
-			clonedVersion, err := cloneFromVersion(latestVersion, client)
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-			fmt.Printf("Successfully created new version %d from latest version %s\n\n", clonedVersion.Number, latestVersion)
-			selectedVersion = strconv.Itoa(clonedVersion.Number)
-		}
+	selectedVersion, err := acquireVersion(f, client)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
 	}
 
-	processFiles(uploadVCL, handleResponse, f, client)
+	processFiles(selectedVersion, uploadVCL, handleResponse, f, client)
 }
 
 func checkIncorrectFlagConfiguration(f flags.Flags) {
@@ -256,7 +190,81 @@ func cloneFromVersion(version string, client *fastly.Client) (*fastly.Version, e
 	return clonedVersion, nil
 }
 
-func uploadVCL(path string, client *fastly.Client, ch chan vclResponse) {
+func acquireVersion(f flags.Flags, client *fastly.Client) (string, error) {
+	// clone from specified version and upload to that
+	if *f.Sub.CloneVersion != "" {
+		clonedVersion, err := cloneFromVersion(*f.Sub.CloneVersion, client)
+		if err != nil {
+			return "", err
+		}
+
+		fmt.Printf("Successfully created new version %d from existing version %s\n\n", clonedVersion.Number, *f.Sub.CloneVersion)
+		return strconv.Itoa(clonedVersion.Number), nil
+	}
+
+	// upload to the specified version (it can't be activated)
+	if *f.Sub.UploadVersion != "" {
+		v, err := strconv.Atoi(*f.Sub.UploadVersion)
+		if err != nil {
+			return "", err
+		}
+
+		getVersion, err := client.GetVersion(&fastly.GetVersionInput{
+			Service: fastlyServiceID,
+			Version: v,
+		})
+		if err != nil {
+			return "", err
+		}
+
+		if getVersion.Active {
+			fmt.Println("Sorry, the specified version is already activated")
+			return "", err
+		}
+
+		return *f.Sub.UploadVersion, nil
+	}
+
+	// upload to the latest version
+	// note: latest version must not be activated already
+	if *f.Sub.UseLatestVersion {
+		latestVersion, err := getLatestVCLVersion(client)
+		if err != nil {
+			return "", err
+		}
+
+		v, err := strconv.Atoi(latestVersion)
+		if err != nil {
+			return "", err
+		}
+
+		getVersion, err := client.GetVersion(&fastly.GetVersionInput{
+			Service: fastlyServiceID,
+			Version: v,
+		})
+		if err != nil {
+			return "", err
+		}
+
+		if getVersion.Active {
+			fmt.Println("Sorry, the latest version is already activated")
+			return "", err
+		}
+
+		return latestVersion, nil
+	}
+
+	// otherwise clone the latest version and upload to that
+	clonedVersion, err := cloneFromVersion(latestVersion, client)
+	if err != nil {
+		return "", err
+	}
+
+	fmt.Printf("Successfully created new version %d from latest version %s\n\n", clonedVersion.Number, latestVersion)
+	return strconv.Itoa(clonedVersion.Number), nil
+}
+
+func uploadVCL(selectedVersion, path string, client *fastly.Client, ch chan vclResponse) {
 	defer wg.Done()
 
 	name := extractName(path)
@@ -284,7 +292,7 @@ func uploadVCL(path string, client *fastly.Client, ch chan vclResponse) {
 		})
 
 		if err != nil {
-			fmt.Printf("\nThere was an error creating the file '%s':\n%s\nWe'll now try updating this file instead of creating it\n", yellow(name), red(err))
+			fmt.Printf("There was an error creating the file '%s':\n%s\nWe'll now try updating this file instead of creating it\n\n", yellow(name), red(err))
 
 			vclFileUpdate, updateErr := client.UpdateVCL(&fastly.UpdateVCLInput{
 				Service: fastlyServiceID,
@@ -340,10 +348,10 @@ func getLatestServiceVersion(client *fastly.Client) (string, string, error) {
 	return latestVersion, status, nil
 }
 
-func handleResponse(vr vclResponse, debug bool) {
+func handleResponse(vr vclResponse, debug bool, selectedVersion string) {
 	if vr.Error {
-		fmt.Printf("Whoops, the file '%s' didn't upload because of the following error:\n\t%s\n", yellow(vr.Name), red(vr.Content))
+		fmt.Printf("Whoops, the file '%s' didn't upload to version '%s' because of the following error:\n\t%s\n", yellow(vr.Name), selectedVersion, red(vr.Content))
 	} else {
-		fmt.Printf("Yay, the file '%s' was updated successfully\n", green(vr.Name))
+		fmt.Printf("Yay, the file '%s' in version '%s' was updated successfully\n", green(vr.Name), yellow(selectedVersion))
 	}
 }

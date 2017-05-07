@@ -30,7 +30,6 @@ var dirMatchRegex *regexp.Regexp
 // globals needed for sharing between functions
 var fastlyServiceID string
 var latestVersion string
-var selectedVersion string
 
 // the WaitGroup is used when processing files with multiple goroutine
 var wg sync.WaitGroup
@@ -61,8 +60,8 @@ type vclResponse struct {
 	Error   bool
 }
 
-type fileProcessor func(string, *fastly.Client, chan vclResponse)
-type responseProcessor func(vclResponse, bool)
+type fileProcessor func(string, string, *fastly.Client, chan vclResponse)
+type responseProcessor func(vclResponse, bool, string)
 
 // function called by filepath.Walk
 func aggregate(path string, f os.FileInfo, err error) error {
@@ -132,7 +131,7 @@ func configureSkipMatch(f flags.Flags) {
 // the goroutine behaviour is provided by the caller
 // finally, it ranges over the buffered channel of data
 // each item in the channel is processed dependant on the caller provided function
-func processFiles(fp fileProcessor, rp responseProcessor, f flags.Flags, client *fastly.Client) {
+func processFiles(selectedVersion string, fp fileProcessor, rp responseProcessor, f flags.Flags, client *fastly.Client) {
 	walkError := filepath.Walk(*f.Top.Directory, aggregate)
 	if walkError != nil {
 		fmt.Printf("filepath.Walk() returned an error: %v\n", walkError)
@@ -147,7 +146,7 @@ func processFiles(fp fileProcessor, rp responseProcessor, f flags.Flags, client 
 
 	for _, vclPath := range vclFiles {
 		wg.Add(1)
-		go fp(vclPath, client, ch)
+		go fp(selectedVersion, vclPath, client, ch)
 	}
 	wg.Wait()
 
@@ -157,6 +156,6 @@ func processFiles(fp fileProcessor, rp responseProcessor, f flags.Flags, client 
 	vclFiles = []string{}
 
 	for vclFile := range ch {
-		rp(vclFile, *f.Top.Debug)
+		rp(vclFile, *f.Top.Debug, selectedVersion)
 	}
 }

@@ -32,16 +32,18 @@ func Diff(f flags.Flags) {
 		os.Exit(1)
 	}
 
+	var selectedVersion string
+
 	if *f.Sub.VclVersion != "" {
 		selectedVersion = *f.Sub.VclVersion
 	} else {
 		selectedVersion = latestVersion
 	}
 
-	processFiles(getVCL, processDiff, f, client)
+	processFiles(selectedVersion, getVCL, processDiff, f, client)
 }
 
-func getVCL(path string, client *fastly.Client, ch chan vclResponse) {
+func getVCL(selectedVersion, path string, client *fastly.Client, ch chan vclResponse) {
 	defer wg.Done()
 
 	logger.WithFields(logrus.Fields{
@@ -107,7 +109,7 @@ func getVCL(path string, client *fastly.Client, ch chan vclResponse) {
 	}
 }
 
-func processDiff(vr vclResponse, debug bool) {
+func processDiff(vr vclResponse, debug bool, selectedVersion string) {
 	var (
 		err    error
 		cmdOut []byte
