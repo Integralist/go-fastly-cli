@@ -117,9 +117,34 @@ To remove all compiled binaries, vim files and containers:
 make clean
 ```
 
+## Examples
+
+```bash
+# diff local version against lastest remote version
+fastly diff
+
+# diff local version against specific remote version
+fastly diff -vcl-version 123
+
+# activate debug mode
+# this will mean debug logs are displayed
+# for 'diff' this will mean diff output is displayed as well
+fastly -debug diff -vcl-version 123
+
+# upload local files to remove service version
+# token and service automatically picked up from environment
+fastly upload -upload-version 123
+
+# activate service
+fastly upload -activate-version 123
+
+# token and service explicitly set
+$ fastly -service xxx -token xxx upload -upload-version 123
+```
+
 ## TODO
 
 * Test Suite
 * Ability to diff two remote services (not just local against a remote)
 * Ability to upload an individual file (not just pattern matched list of files)
-* Code Refactoring
+* Refactor flags (most flags under 'upload' subcommand should be moved out)
