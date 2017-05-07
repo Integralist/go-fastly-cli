@@ -66,14 +66,14 @@ func New() Flags {
 
 func subCommands(t TopLevelFlags) SubCommandFlags {
 	return SubCommandFlags{
-		VclVersion:       t.Diff.String("vcl-version", "", "specify Fastly service 'version' to verify against"),
-		UseLatestVersion: t.Upload.Bool("use-latest-version", false, "use latest Fastly service version to upload to (presumes not activated)"),
-		GetLatestVersion: t.Upload.Bool("get-latest-version", false, "get latest Fastly service version and its active status"),
-		GetSettings:      t.Upload.String("get-settings", "", "get settings (Default TTL & Host) for specified Fastly service version (version number or latest)"),
-		CloneVersion:     t.Upload.String("clone-version", "", "specify Fastly service 'version' to clone from before uploading to"),
-		UploadVersion:    t.Upload.String("upload-version", "", "specify non-active Fastly service 'version' to upload to"),
-		ActivateVersion:  t.Upload.String("activate-version", "", "specify Fastly service 'version' to activate"),
-		GetVersionStatus: t.Upload.String("get-version-status", "", "retrieve status for the specified Fastly service 'version'"),
+		VclVersion:       t.Diff.String("version", "", "specify Fastly service 'version' to verify against"),
+		UseLatestVersion: t.Upload.Bool("use-latest", false, "use latest Fastly service version to upload to (presumes not activated)"),
+		GetLatestVersion: t.Upload.Bool("get-latest", false, "get latest Fastly service version and its active status"),
+		GetSettings:      t.Upload.String("settings", "", "get settings (Default TTL & Host) for specified Fastly service version (version number or latest)"),
+		CloneVersion:     t.Upload.String("clone", "", "specify Fastly service 'version' to clone from before uploading to"),
+		UploadVersion:    t.Upload.String("version", "", "specify non-active Fastly service 'version' to upload to"),
+		ActivateVersion:  t.Upload.String("activate", "", "specify Fastly service 'version' to activate"),
+		GetVersionStatus: t.Upload.String("status", "", "retrieve status for the specified Fastly service 'version'"),
 	}
 }
 

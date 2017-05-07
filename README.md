@@ -49,7 +49,7 @@ Diff Options:
 fastly diff -help
 
 Usage of diff:
-  -vcl-version string
+  -version string
         specify Fastly service 'version' to verify against
 ```
 
@@ -59,19 +59,19 @@ Upload Options:
 fastly upload -help
 
 Usage of upload:
-  -activate-version string
+  -activate string
         specify Fastly service 'version' to activate
-  -clone-version string
+  -clone string
         specify Fastly service 'version' to clone from before uploading to
-  -get-latest-version
+  -get-latest
         get latest Fastly service version and its active status
-  -get-settings string
+  -settings string
         get settings (Default TTL & Host) for specified Fastly service version (version number or latest)
-  -get-version-status string
+  -status string
         retrieve status for the specified Fastly service 'version'
-  -upload-version string
+  -version string
         specify non-active Fastly service 'version' to upload to
-  -use-latest-version
+  -use-latest
         use latest Fastly service version to upload to (presumes not activated)
 ```
 
@@ -124,22 +124,31 @@ make clean
 fastly diff
 
 # diff local version against specific remote version
-fastly diff -vcl-version 123
+fastly diff -version 123
 
 # activate debug mode
 # this will mean debug logs are displayed
 # for 'diff' this will mean diff output is displayed as well
-fastly -debug diff -vcl-version 123
+fastly -debug diff -version 123
 
-# upload local files to remove service version
+# view latest service version
+fastly upload -get-latest
+
+# view status for the specified service version
+fastly upload -status
+
+# view service settings
+fastly upload -settings 123
+
+# upload local files to remote service version
 # token and service automatically picked up from environment
-fastly upload -upload-version 123
-
-# activate service
-fastly upload -activate-version 123
+fastly upload -version 123
 
 # token and service explicitly set
-$ fastly -service xxx -token xxx upload -upload-version 123
+fastly -service xxx -token xxx upload -version 123
+
+# activate service
+fastly upload -activate 123
 ```
 
 ## TODO
