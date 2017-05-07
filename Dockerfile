@@ -1,7 +1,7 @@
 FROM golang:1.8
 
 RUN apt-get update -y
-RUN apt-get install -y wget git ncurses-dev time
+RUN apt-get install -y wget git ncurses-dev time silversearcher-ag
 
 WORKDIR /tmp
 RUN git clone https://github.com/vim/vim.git && cd vim && make && make install
