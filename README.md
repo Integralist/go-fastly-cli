@@ -23,23 +23,23 @@ Flags:
 fastly -help
 
   -activate string
-        specify Fastly service 'version' to activate
+        specify Fastly service version to activate
   -debug
-        show any error/diff output + debug logs
+        show any debug logs and subcommand specific information
   -dir string
-        vcl directory to compare files against 
+        the directory where your vcl files are located
   -help
         show available flags
   -match string
-        regex for matching vcl directories (will also try: VCL_MATCH_DIRECTORY)
+        regex for matching vcl directories (fallback: VCL_MATCH_DIRECTORY)
   -service string
-        your service id (fallback: FASTLY_SERVICE_ID) 
+        your Fastly service id (fallback: FASTLY_SERVICE_ID) 
   -settings string
-        get settings (Default TTL & Host) for specified Fastly service version (version number or latest)
+        get settings for the specified Fastly service version (try: 'latest')
   -skip string
         regex for skipping vcl directories (will also try: VCL_SKIP_DIRECTORY) 
   -status string
-        retrieve status for the specified Fastly service 'version' (try: 'latest')
+        get status for the specified Fastly service version (try: 'latest')
   -token string
         your fastly api token (fallback: FASTLY_API_TOKEN) 
   -version
@@ -53,7 +53,7 @@ fastly diff -help
 
 Usage of diff:
   -version string
-        specify Fastly service 'version' to verify against
+        specify Fastly service version to verify against
 ```
 
 Upload Options:
@@ -63,11 +63,11 @@ fastly upload -help
 
 Usage of upload:
   -clone string
-        specify Fastly service 'version' to clone from before uploading to
-  -version string
-        specify non-active Fastly service 'version' to upload to
+        specify a Fastly service version to clone from (files will upload to it)
   -latest
         use latest Fastly service version to upload to (presumes not activated)
+  -version string
+        specify non-active Fastly service version to upload to
 ```
 
 ## Environment Variables
@@ -114,7 +114,7 @@ make clean
 
 ## Examples
 
-> Note: all examples presume FASTLY_API_TOKEN/FASTLY_SERVICE_ID env vars set
+> Note: all examples presume `FASTLY_API_TOKEN`/`FASTLY_SERVICE_ID` env vars set
 
 ```bash
 # view status for the latest service version
@@ -123,22 +123,24 @@ fastly -status latest
 # view status for the specified service version
 fastly -status 123
 
+# view settings for the latest service version
+fastly -settings latest
+
 # view settings for the specified service version
-# note: typically they're always the same across service versions
 fastly -settings 123
 
 # activate specified service version
 fastly -activate 123
 
-# diff local version against lastest remote version
+# diff local vcl files against the lastest remote versions
 fastly diff
 
-# diff local version against specific remote version
+# diff local vcl files against the specific remote versions
 fastly diff -version 123
 
 # enable debug mode
 # this will mean debug logs are displayed
-# for 'diff' command this will also display the diff (per file)
+# for 'diff' subcommand: also display per file diff
 fastly -debug diff -version 123
 
 # upload local files to remote service version
@@ -159,4 +161,3 @@ fastly upload -latest
 * Test Suite
 * Ability to diff two remote services (not just local against a remote)
 * Ability to upload an individual file (not just pattern matched list of files)
-* Refactor flags (most flags under 'upload' subcommand should be moved out)
