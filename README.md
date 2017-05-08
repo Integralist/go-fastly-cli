@@ -154,6 +154,9 @@ fastly upload -clone 123
 
 # upload local files to the latest remote service version
 fastly upload -latest
+
+# clone latest service version available and upload local files to it
+fastly upload
 ```
 
 ## TODO

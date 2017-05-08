@@ -22,10 +22,10 @@ func Upload(f flags.Flags, client *fastly.Client) {
 
 	// the acquireVersion function checks if we should...
 	//
-	// 		A. clone the specified version before uploading files: `-clone-version`
-	// 		B. upload files to the specified version: `-upload-version`
-	// 		C. upload files to the latest version: `-use-latest-version`
-	// 		D. clone the latest version if it's already activated
+	// 		A. clone the specified version before uploading files: `-clone`
+	// 		B. upload files to the specified version: `-version`
+	// 		C. upload files to the latest version: `-latest`
+	// 		D. clone the latest version available
 	selectedVersion, err := acquireVersion(f, client)
 	if err != nil {
 		fmt.Println(err)
