@@ -110,8 +110,7 @@ func acquireVersion(f flags.Flags, client *fastly.Client) (int, error) {
 		}
 
 		if getVersion.Active {
-			fmt.Println("Sorry, the latest version is already activated")
-			return 0, err
+			return 0, fmt.Errorf("Sorry, the latest version is already activated")
 		}
 
 		return latestVersion, nil
