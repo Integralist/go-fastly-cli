@@ -31,13 +31,13 @@ fastly -help
   -help
         show available flags
   -match string
-        regex for matching vcl directories (fallback: VCL_MATCH_DIRECTORY)
+        regex for matching vcl directories (fallback: VCL_MATCH_PATH)
   -service string
         your Fastly service id (fallback: FASTLY_SERVICE_ID) 
   -settings string
         get settings for the specified Fastly service version (try: 'latest')
   -skip string
-        regex for skipping vcl directories (will also try: VCL_SKIP_DIRECTORY) 
+        regex for skipping vcl directories (will also try: VCL_SKIP_PATH) 
   -status string
         get status for the specified Fastly service version (try: 'latest')
   -token string
@@ -81,8 +81,8 @@ Below is a list of environment variables this tool supports:
 * `FASTLY_API_TOKEN` (`-token`)
 * `FASTLY_SERVICE_ID` (`-service`)
 * `VCL_DIRECTORY` (`-dir`)
-* `VCL_MATCH_DIRECTORY` (`-match`)
-* `VCL_SKIP_DIRECTORY` (`-skip`)
+* `VCL_MATCH_PATH` (`-match`)
+* `VCL_SKIP_PATH` (`-skip`)
 
 > Use the relevant CLI flags to override these values
 

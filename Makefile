@@ -32,8 +32,8 @@ dev: build remove_vim_files
 		-e FASTLY_API_TOKEN="${FASTLY_API_TOKEN}" \
 		-e FASTLY_SERVICE_ID="${FASTLY_SERVICE_ID}" \
 		-e VCL_DIRECTORY="${VCL_DIRECTORY}" \
-		-e VCL_MATCH_DIRECTORY="${VCL_MATCH_DIRECTORY}" \
-		-e VCL_SKIP_DIRECTORY="${VCL_SKIP_DIRECTORY}" \
+		-e VCL_MATCH_PATH="${VCL_MATCH_PATH}" \
+		-e VCL_SKIP_PATH="${VCL_SKIP_PATH}" \
 		$(container_env) /bin/bash
 
 rebuild: clean run

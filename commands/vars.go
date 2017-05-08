@@ -73,21 +73,27 @@ func extractName(path string) string {
 }
 
 func configureSkipMatch(f flags.Flags) {
-	// check if env vars are defined. If so, use them to override default values
-	envSkipDir := os.Getenv("VCL_SKIP_DIRECTORY")
-	envMatchDir := os.Getenv("VCL_MATCH_DIRECTORY")
+	skipDefault := "^____"
+	matchDefault := ""
 
-	if envSkipDir != "" {
-		*f.Top.Skip = envSkipDir
+	skipRegex := *f.Top.Skip
+	matchRegex := *f.Top.Match
+
+	if skipRegex == skipDefault && os.Getenv("VCL_SKIP_PATH") != "" {
+		skipRegex = os.Getenv("VCL_SKIP_PATH")
+	}
+	if matchRegex == matchDefault && os.Getenv("VCL_MATCH_PATH") != "" {
+		matchRegex = os.Getenv("VCL_MATCH_PATH")
 	}
 
-	if envMatchDir != "" {
-		*f.Top.Match = envMatchDir
-	}
+	logger.WithFields(logrus.Fields{
+		"skip":  skipRegex,
+		"match": matchRegex,
+	}).Debug("compile skip/match regexes")
 
 	// compile regex with provided values or the defaults (see vars.go for usage)
-	dirSkipRegex, _ = regexp.Compile(*f.Top.Skip)
-	dirMatchRegex, _ = regexp.Compile(*f.Top.Match)
+	dirSkipRegex, _ = regexp.Compile(skipRegex)
+	dirMatchRegex, _ = regexp.Compile(matchRegex)
 }
 
 // processFiles first aggregates all available local VCL files
