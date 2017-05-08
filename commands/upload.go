@@ -8,14 +8,8 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/fatih/color"
 	fastly "github.com/sethvargo/go-fastly"
 )
-
-// useful colour settings for printing messages
-var yellow = color.New(color.FgYellow).SprintFunc()
-var red = color.New(color.FgRed).SprintFunc()
-var green = color.New(color.FgGreen).SprintFunc()
 
 // Upload takes specified list of files and creates new remote version
 // if upload fails it'll attempt uploading over existing remote version
@@ -167,7 +161,7 @@ func uploadVCL(selectedVersion, path string, client *fastly.Client, ch chan vclR
 		})
 
 		if err != nil {
-			fmt.Printf("There was an error creating the file '%s':\n%s\nWe'll now try updating this file instead of creating it\n\n", yellow(name), red(err))
+			fmt.Printf("There was an error creating the file '%s':\n%s\nWe'll now try updating this file instead of creating it\n\n", common.Yellow(name), common.Red(err))
 
 			vclFileUpdate, updateErr := client.UpdateVCL(&fastly.UpdateVCLInput{
 				Service: fastlyServiceID,
@@ -211,8 +205,8 @@ func getLocalVCL(path string) (string, error) {
 
 func handleResponse(vr vclResponse, debug bool, selectedVersion string) {
 	if vr.Error {
-		fmt.Printf("Whoops, the file '%s' didn't upload to version '%s' because of the following error:\n\t%s\n\n", yellow(vr.Name), selectedVersion, red(vr.Content))
+		fmt.Printf("Whoops, the file '%s' didn't upload to version '%s' because of the following error:\n\t%s\n\n", common.Yellow(vr.Name), selectedVersion, common.Red(vr.Content))
 	} else {
-		fmt.Printf("Yay, the file '%s' in version '%s' was updated successfully\n", green(vr.Name), yellow(selectedVersion))
+		fmt.Printf("Yay, the file '%s' in version '%s' was updated successfully\n", common.Green(vr.Name), common.Yellow(selectedVersion))
 	}
 }

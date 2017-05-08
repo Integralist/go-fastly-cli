@@ -4,8 +4,20 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/fatih/color"
 	fastly "github.com/sethvargo/go-fastly"
 )
+
+// useful colour settings for printing messages...
+
+// Yellow colours stdout to be yellow
+var Yellow = color.New(color.FgYellow).SprintFunc()
+
+// Red colours stdout to be red
+var Red = color.New(color.FgRed).SprintFunc()
+
+// Green colours stdout to be green
+var Green = color.New(color.FgGreen).SprintFunc()
 
 // fastly API doesn't return sorted data
 // so we have to manually sort the data ourselves

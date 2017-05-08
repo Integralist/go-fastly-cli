@@ -8,16 +8,12 @@ import (
 	"os"
 	"standalone"
 
-	"github.com/fatih/color"
 	fastly "github.com/sethvargo/go-fastly"
 	"github.com/sirupsen/logrus"
 )
 
 // appVersion is the application version
 const appVersion = "0.0.1"
-
-// useful colour settings for printing messages
-var yellow = color.New(color.FgYellow).SprintFunc()
 
 var logger *logrus.Entry
 
@@ -31,6 +27,8 @@ func init() {
 
 func main() {
 	f := flags.New()
+
+	logger.Debug("flags initialised, application starting")
 
 	if *f.Top.Help == true {
 		flag.PrintDefaults()
@@ -87,8 +85,6 @@ func main() {
 		standalone.PrintSettingsFor(*f.Top.Service, *f.Top.Settings, client)
 		return
 	}
-
-	logger.Debug("application starting")
 
 	args := os.Args[1:] // strip first arg `fastly`
 	arg, counter := flags.Check(args)
