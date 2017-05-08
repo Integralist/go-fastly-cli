@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"common"
 	"flags"
 	"fmt"
 	"os"
@@ -25,7 +26,7 @@ func Diff(f flags.Flags, client *fastly.Client) {
 	if *f.Sub.VclVersion != "" {
 		selectedVersion = *f.Sub.VclVersion
 	} else {
-		latestVersion, err := getLatestVCLVersion(client)
+		latestVersion, err := common.GetLatestVCLVersion(*f.Top.Service, client)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)

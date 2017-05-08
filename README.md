@@ -13,12 +13,9 @@ go get github.com/integralist/go-fastly-cli
 ## Usage
 
 ```bash
-fastly <flags> diff <options>
-fastly <flags> upload <options>
+fastly <flags> [diff <options>]
+fastly <flags> [upload <options>]
 ```
-
-> flags: settings common to both commands  
-> options: unique to the specific command
 
 Flags:
 
@@ -37,10 +34,12 @@ fastly -help
         regex for matching vcl directories (will also try: VCL_MATCH_DIRECTORY)
   -service string
         your service id (fallback: FASTLY_SERVICE_ID) 
+  -settings string
+        get settings (Default TTL & Host) for specified Fastly service version (version number or latest)
   -skip string
         regex for skipping vcl directories (will also try: VCL_SKIP_DIRECTORY) 
   -status string
-        retrieve status for the specified Fastly service 'version'
+        retrieve status for the specified Fastly service 'version' (try: 'latest')
   -token string
         your fastly api token (fallback: FASTLY_API_TOKEN) 
   -version
@@ -65,13 +64,9 @@ fastly upload -help
 Usage of upload:
   -clone string
         specify Fastly service 'version' to clone from before uploading to
-  -get-latest
-        get latest Fastly service version and its active status
-  -settings string
-        get settings (Default TTL & Host) for specified Fastly service version (version number or latest)
   -version string
         specify non-active Fastly service 'version' to upload to
-  -use-latest
+  -latest
         use latest Fastly service version to upload to (presumes not activated)
 ```
 
@@ -119,9 +114,18 @@ make clean
 
 ## Examples
 
+> Note: all examples presume FASTLY_API_TOKEN/FASTLY_SERVICE_ID env vars set
+
 ```bash
+# view status for the latest service version
+fastly -status latest
+
 # view status for the specified service version
 fastly -status 123
+
+# view settings for the specified service version
+# note: typically they're always the same across service versions
+fastly -settings 123
 
 # activate specified service version
 fastly -activate 123
@@ -134,21 +138,20 @@ fastly diff -version 123
 
 # enable debug mode
 # this will mean debug logs are displayed
-# for 'diff' this will mean diff output is displayed as well
+# for 'diff' command this will also display the diff (per file)
 fastly -debug diff -version 123
 
-# view latest service version
-fastly upload -get-latest
-
-# view service settings
-fastly upload -settings 123
-
 # upload local files to remote service version
-# token and service automatically picked up from environment
 fastly upload -version 123
 
-# token and service explicitly set
+# token and service explicitly set to override env vars
 fastly -service xxx -token xxx upload -version 123
+
+# clone specified service version and upload local files to it
+fastly upload -clone 123
+
+# upload local files to the latest remote service version
+fastly upload -latest
 ```
 
 ## TODO

@@ -18,17 +18,15 @@ func init() {
 
 // TopLevelFlags defines the common settings across all commands
 type TopLevelFlags struct {
-	Help, Debug, Version                                     *bool
-	Token, Service, Directory, Match, Skip, Status, Activate *string
-	Diff, Upload                                             *flag.FlagSet
+	Help, Debug, Version                                               *bool
+	Token, Service, Directory, Match, Skip, Status, Activate, Settings *string
+	Diff, Upload                                                       *flag.FlagSet
 }
 
 // SubCommandFlags defines the settings for the subcommands
 type SubCommandFlags struct {
 	VclVersion       *string
 	UseLatestVersion *bool
-	GetLatestVersion *bool
-	GetSettings      *string
 	CloneVersion     *string
 	UploadVersion    *string
 }
@@ -50,7 +48,8 @@ func New() Flags {
 		Directory: flag.String("dir", os.Getenv("VCL_DIRECTORY"), "vcl directory to compare files against"),
 		Match:     flag.String("match", "", "regex for matching vcl directories (will also try: VCL_MATCH_DIRECTORY)"),
 		Skip:      flag.String("skip", "^____", "regex for skipping vcl directories (will also try: VCL_SKIP_DIRECTORY)"),
-		Status:    flag.String("status", "", "retrieve status for the specified Fastly service 'version'"),
+		Status:    flag.String("status", "", "retrieve status for the specified Fastly service 'version' (try: 'latest')"),
+		Settings:  flag.String("settings", "", "get settings (Default TTL & Host) for specified Fastly service version (version number or latest)"),
 		Activate:  flag.String("activate", "", "specify Fastly service 'version' to activate"),
 		Diff:      flag.NewFlagSet("diff", flag.ExitOnError),
 		Upload:    flag.NewFlagSet("upload", flag.ExitOnError),
@@ -67,9 +66,7 @@ func New() Flags {
 func subCommands(t TopLevelFlags) SubCommandFlags {
 	return SubCommandFlags{
 		VclVersion:       t.Diff.String("version", "", "specify Fastly service 'version' to verify against"),
-		UseLatestVersion: t.Upload.Bool("use-latest", false, "use latest Fastly service version to upload to (presumes not activated)"),
-		GetLatestVersion: t.Upload.Bool("get-latest", false, "get latest Fastly service version and its active status"),
-		GetSettings:      t.Upload.String("settings", "", "get settings (Default TTL & Host) for specified Fastly service version (version number or latest)"),
+		UseLatestVersion: t.Upload.Bool("latest", false, "use latest Fastly service version to upload to (presumes not activated)"),
 		CloneVersion:     t.Upload.String("clone", "", "specify Fastly service 'version' to clone from before uploading to"),
 		UploadVersion:    t.Upload.String("version", "", "specify non-active Fastly service 'version' to upload to"),
 	}

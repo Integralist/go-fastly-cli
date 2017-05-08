@@ -2,6 +2,7 @@ package main
 
 import (
 	"commands"
+	"common"
 	"flag"
 	"flags"
 	"fmt"
@@ -54,6 +55,22 @@ func main() {
 		os.Exit(1)
 	}
 
+	if *f.Top.Activate != "" {
+		activateVersion(f, client)
+		return
+	}
+
+	if *f.Top.Status != "" && *f.Top.Status == "latest" {
+		latestVersion, status, err := getLatestServiceVersion(f, client)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		fmt.Printf("\nLatest service version: %s (%s)\n\n", latestVersion, status)
+		return
+	}
+
 	if *f.Top.Status != "" {
 		status, err := getStatusVersion(*f.Top.Service, *f.Top.Status, client)
 		if err != nil {
@@ -64,8 +81,13 @@ func main() {
 		return
 	}
 
-	if *f.Top.Activate != "" {
-		activateVersion(f, client)
+	if *f.Top.Settings == "latest" {
+		printLatestSettings(f, client)
+		return
+	}
+
+	if *f.Top.Settings != "" {
+		printSettingsFor(*f.Top.Settings, f, client)
 		return
 	}
 
@@ -105,6 +127,20 @@ func activateVersion(f flags.Flags, client *fastly.Client) {
 	fmt.Printf("\nService '%s' now has version '%s' activated\n\n", yellow(*f.Top.Service), green(*f.Top.Activate))
 }
 
+func getLatestServiceVersion(f flags.Flags, client *fastly.Client) (string, string, error) {
+	latestVersion, err := common.GetLatestVCLVersion(*f.Top.Service, client)
+	if err != nil {
+		return "", "", err
+	}
+
+	status, err := getStatusVersion(*f.Top.Service, latestVersion, client)
+	if err != nil {
+		return "", "", err
+	}
+
+	return latestVersion, status, nil
+}
+
 func getStatusVersion(serviceVersion, statusVersion string, client *fastly.Client) (string, error) {
 	v, err := strconv.Atoi(statusVersion)
 	if err != nil {
@@ -126,4 +162,37 @@ func getStatusVersion(serviceVersion, statusVersion string, client *fastly.Clien
 	}
 
 	return status, nil
+}
+
+func printLatestSettings(f flags.Flags, client *fastly.Client) {
+	latestVersion, _, err := getLatestServiceVersion(f, client)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	printSettingsFor(latestVersion, f, client)
+}
+
+func printSettingsFor(serviceVersion string, f flags.Flags, client *fastly.Client) {
+	v, err := strconv.Atoi(serviceVersion)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	settings, err := client.GetSettings(&fastly.GetSettingsInput{
+		Service: *f.Top.Service,
+		Version: v,
+	})
+	if err != nil {
+		fmt.Printf("\nThere was a problem getting the settings for version %s\n\n%s", yellow(serviceVersion), red(err))
+		os.Exit(1)
+	}
+
+	fmt.Printf(
+		"\nDefault Host: %s\nDefault TTL: %d (seconds)\n\n",
+		settings.DefaultHost,
+		settings.DefaultTTL,
+	)
 }

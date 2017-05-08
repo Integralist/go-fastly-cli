@@ -6,8 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"sort"
-	"strconv"
 	"strings"
 	"sync"
 
@@ -36,21 +34,6 @@ var wg sync.WaitGroup
 
 // list of VCL files to process
 var vclFiles []string
-
-// fastly API doesn't return sorted data
-// so we have to manually sort the data ourselves
-type version struct {
-	Number  int
-	Version *fastly.Version
-}
-type wrappedVersions []version
-
-// satisfy the Sort interface
-func (v wrappedVersions) Len() int      { return len(v) }
-func (v wrappedVersions) Swap(i, j int) { v[i], v[j] = v[j], v[i] }
-func (v wrappedVersions) Less(i, j int) bool {
-	return v[i].Number < v[j].Number
-}
 
 // data structure for Fastly API response
 type vclResponse struct {
@@ -87,24 +70,6 @@ func invalidPathUserDefined(path string) bool {
 func extractName(path string) string {
 	_, file := filepath.Split(path)
 	return strings.Split(file, ".")[0]
-}
-
-func getLatestVCLVersion(client *fastly.Client) (string, error) {
-	// we have to get all the versions and then sort them to find the actual latest
-	listVersions, err := client.ListVersions(&fastly.ListVersionsInput{
-		Service: fastlyServiceID,
-	})
-	if err != nil {
-		return "", err
-	}
-
-	wv := wrappedVersions{}
-	for _, v := range listVersions {
-		wv = append(wv, version{v.Number, v})
-	}
-	sort.Sort(wv)
-
-	return strconv.Itoa(wv[len(wv)-1].Number), nil
 }
 
 func configureSkipMatch(f flags.Flags) {

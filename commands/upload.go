@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"common"
 	"flags"
 	"fmt"
 	"io/ioutil"
@@ -25,24 +26,6 @@ func Upload(f flags.Flags, client *fastly.Client) {
 	// store value rather than dereference pointer multiple times later
 	fastlyServiceID = *f.Top.Service
 
-	// print latest host settings for the specified fastly service
-	if *f.Sub.GetSettings == "latest" {
-		printLatestSettings(client)
-		return
-	}
-
-	// print host settings for the provided version of specified fastly service
-	if *f.Sub.GetSettings != "" {
-		printSettingsFor(*f.Sub.GetSettings, client)
-		return
-	}
-
-	// print latest service version and its status
-	if *f.Sub.GetLatestVersion {
-		printLatestServiceVersion(client)
-		return
-	}
-
 	// the acquireVersion function checks if we should...
 	//
 	// 		A. clone the specified version before uploading files: `-clone-version`
@@ -63,73 +46,6 @@ func checkIncorrectFlagConfiguration(f flags.Flags) {
 		fmt.Println("Please do not provide both -clone-version and -upload-version flags")
 		os.Exit(1)
 	}
-}
-
-func printLatestSettings(client *fastly.Client) {
-	latestVersion, _, err := getLatestServiceVersion(client)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	printSettingsFor(latestVersion, client)
-}
-
-func printLatestServiceVersion(client *fastly.Client) {
-	latestVersion, status, err := getLatestServiceVersion(client)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	fmt.Printf("\nLatest service version: %s (%s)\n\n", latestVersion, status)
-}
-
-func printSettingsFor(serviceVersion string, client *fastly.Client) {
-	v, err := strconv.Atoi(serviceVersion)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	settings, err := client.GetSettings(&fastly.GetSettingsInput{
-		Service: fastlyServiceID,
-		Version: v,
-	})
-	if err != nil {
-		fmt.Printf("\nThere was a problem getting the settings for version %s\n\n%s", yellow(serviceVersion), red(err))
-		os.Exit(1)
-	}
-
-	fmt.Printf(
-		"\nDefault Host: %s\nDefault TTL: %d (seconds)\n\n",
-		settings.DefaultHost,
-		settings.DefaultTTL,
-	)
-}
-
-// TODO: duplicated in main package
-func getStatusVersion(statusVersion string, client *fastly.Client) (string, error) {
-	v, err := strconv.Atoi(statusVersion)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	versionStatus, err := client.GetVersion(&fastly.GetVersionInput{
-		Service: fastlyServiceID,
-		Version: v,
-	})
-	if err != nil {
-		return "", err
-	}
-
-	status := green("not activated")
-	if versionStatus.Active {
-		status = red("already activated")
-	}
-
-	return status, nil
 }
 
 func cloneFromVersion(version string, client *fastly.Client) (*fastly.Version, error) {
@@ -178,8 +94,7 @@ func acquireVersion(f flags.Flags, client *fastly.Client) (string, error) {
 		}
 
 		if getVersion.Active {
-			fmt.Println("Sorry, the specified version is already activated")
-			return "", err
+			return "", fmt.Errorf("Sorry, the specified version is already activated")
 		}
 
 		return *f.Sub.UploadVersion, nil
@@ -188,7 +103,7 @@ func acquireVersion(f flags.Flags, client *fastly.Client) (string, error) {
 	// upload to the latest version
 	// note: latest version must not be activated already
 	if *f.Sub.UseLatestVersion {
-		latestVersion, err := getLatestVCLVersion(client)
+		latestVersion, err := common.GetLatestVCLVersion(*f.Top.Service, client)
 		if err != nil {
 			return "", err
 		}
@@ -292,20 +207,6 @@ func getLocalVCL(path string) (string, error) {
 		return "", err
 	}
 	return string(content), nil
-}
-
-func getLatestServiceVersion(client *fastly.Client) (string, string, error) {
-	latestVersion, err := getLatestVCLVersion(client)
-	if err != nil {
-		return "", "", err
-	}
-
-	status, err := getStatusVersion(latestVersion, client)
-	if err != nil {
-		return "", "", err
-	}
-
-	return latestVersion, status, nil
 }
 
 func handleResponse(vr vclResponse, debug bool, selectedVersion string) {
