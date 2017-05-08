@@ -40,19 +40,19 @@ type Flags struct {
 // New returns defined flags
 func New() Flags {
 	topLevelFlags := TopLevelFlags{
-		Help:      flag.Bool("help", false, "show available flags"),
+		Activate:  flag.String("activate", "", "specify Fastly service 'version' to activate"),
 		Debug:     flag.Bool("debug", false, "show any error/diff output + debug logs"),
-		Version:   flag.Bool("version", false, "show application version"),
-		Token:     flag.String("token", os.Getenv("FASTLY_API_TOKEN"), "your fastly api token (fallback: FASTLY_API_TOKEN)"),
-		Service:   flag.String("service", os.Getenv("FASTLY_SERVICE_ID"), "your service id (fallback: FASTLY_SERVICE_ID)"),
+		Diff:      flag.NewFlagSet("diff", flag.ExitOnError),
 		Directory: flag.String("dir", os.Getenv("VCL_DIRECTORY"), "vcl directory to compare files against"),
+		Help:      flag.Bool("help", false, "show available flags"),
 		Match:     flag.String("match", "", "regex for matching vcl directories (will also try: VCL_MATCH_DIRECTORY)"),
+		Service:   flag.String("service", os.Getenv("FASTLY_SERVICE_ID"), "your service id (fallback: FASTLY_SERVICE_ID)"),
+		Settings:  flag.String("settings", "", "get settings (Default TTL & Host) for specified Fastly service version (version number or latest)"),
 		Skip:      flag.String("skip", "^____", "regex for skipping vcl directories (will also try: VCL_SKIP_DIRECTORY)"),
 		Status:    flag.String("status", "", "retrieve status for the specified Fastly service 'version' (try: 'latest')"),
-		Settings:  flag.String("settings", "", "get settings (Default TTL & Host) for specified Fastly service version (version number or latest)"),
-		Activate:  flag.String("activate", "", "specify Fastly service 'version' to activate"),
-		Diff:      flag.NewFlagSet("diff", flag.ExitOnError),
+		Token:     flag.String("token", os.Getenv("FASTLY_API_TOKEN"), "your fastly api token (fallback: FASTLY_API_TOKEN)"),
 		Upload:    flag.NewFlagSet("upload", flag.ExitOnError),
+		Version:   flag.Bool("version", false, "show application version"),
 	}
 
 	flag.Parse()
@@ -65,10 +65,10 @@ func New() Flags {
 
 func subCommands(t TopLevelFlags) SubCommandFlags {
 	return SubCommandFlags{
-		VclVersion:       t.Diff.String("version", "", "specify Fastly service 'version' to verify against"),
-		UseLatestVersion: t.Upload.Bool("latest", false, "use latest Fastly service version to upload to (presumes not activated)"),
 		CloneVersion:     t.Upload.String("clone", "", "specify Fastly service 'version' to clone from before uploading to"),
 		UploadVersion:    t.Upload.String("version", "", "specify non-active Fastly service 'version' to upload to"),
+		UseLatestVersion: t.Upload.Bool("latest", false, "use latest Fastly service version to upload to (presumes not activated)"),
+		VclVersion:       t.Diff.String("version", "", "specify Fastly service 'version' to verify against"),
 	}
 }
 

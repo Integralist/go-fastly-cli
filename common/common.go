@@ -24,10 +24,10 @@ func (v wrappedVersions) Less(i, j int) bool {
 
 // GetLatestVCLVersion returns latest fastly service version
 // This service version isn't necessarily the currently active version
-func GetLatestVCLVersion(serviceVersion string, client *fastly.Client) (string, error) {
+func GetLatestVCLVersion(serviceID string, client *fastly.Client) (string, error) {
 	// we have to get all the versions and then sort them to find the actual latest
 	listVersions, err := client.ListVersions(&fastly.ListVersionsInput{
-		Service: serviceVersion,
+		Service: serviceID,
 	})
 	if err != nil {
 		return "", err
