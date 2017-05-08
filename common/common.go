@@ -3,7 +3,6 @@ package common
 import (
 	"fmt"
 	"sort"
-	"strconv"
 
 	"github.com/fatih/color"
 	fastly "github.com/sethvargo/go-fastly"
@@ -37,13 +36,13 @@ func (v wrappedVersions) Less(i, j int) bool {
 
 // GetLatestVCLVersion returns latest fastly service version
 // This service version isn't necessarily the currently active version
-func GetLatestVCLVersion(serviceID string, client *fastly.Client) (string, error) {
+func GetLatestVCLVersion(serviceID string, client *fastly.Client) (int, error) {
 	// we have to get all the versions and then sort them to find the actual latest
 	listVersions, err := client.ListVersions(&fastly.ListVersionsInput{
 		Service: serviceID,
 	})
 	if err != nil {
-		return "", fmt.Errorf("There was a problem getting the version list:\n\n%s", Red(err))
+		return 0, fmt.Errorf("There was a problem getting the version list:\n\n%s", Red(err))
 	}
 
 	wv := wrappedVersions{}
@@ -52,5 +51,5 @@ func GetLatestVCLVersion(serviceID string, client *fastly.Client) (string, error
 	}
 	sort.Sort(wv)
 
-	return strconv.Itoa(wv[len(wv)-1].Number), nil
+	return wv[len(wv)-1].Number, nil
 }

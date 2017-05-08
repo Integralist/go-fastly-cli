@@ -21,10 +21,17 @@ func Diff(f flags.Flags, client *fastly.Client) {
 	// store value rather than dereference pointer multiple times later
 	fastlyServiceID = *f.Top.Service
 
-	var selectedVersion string
+	var (
+		selectedVersion int
+		err             error
+	)
 
 	if *f.Sub.VclVersion != "" {
-		selectedVersion = *f.Sub.VclVersion
+		selectedVersion, err = strconv.Atoi(*f.Sub.VclVersion)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
 	} else {
 		latestVersion, err := common.GetLatestVCLVersion(*f.Top.Service, client)
 		if err != nil {
@@ -37,7 +44,7 @@ func Diff(f flags.Flags, client *fastly.Client) {
 	processFiles(selectedVersion, getVCL, processDiff, f, client)
 }
 
-func getVCL(selectedVersion, path string, client *fastly.Client, ch chan vclResponse) {
+func getVCL(selectedVersion int, path string, client *fastly.Client, ch chan vclResponse) {
 	defer wg.Done()
 
 	logger.WithFields(logrus.Fields{
@@ -48,12 +55,6 @@ func getVCL(selectedVersion, path string, client *fastly.Client, ch chan vclResp
 
 	name := extractName(path)
 
-	v, err := strconv.Atoi(selectedVersion)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
 	logger.WithFields(logrus.Fields{
 		"path": path,
 		"name": name,
@@ -61,7 +62,7 @@ func getVCL(selectedVersion, path string, client *fastly.Client, ch chan vclResp
 
 	vclFile, err := client.GetVCL(&fastly.GetVCLInput{
 		Service: fastlyServiceID,
-		Version: v,
+		Version: selectedVersion,
 		Name:    name,
 	})
 
@@ -103,7 +104,7 @@ func getVCL(selectedVersion, path string, client *fastly.Client, ch chan vclResp
 	}
 }
 
-func processDiff(vr vclResponse, debug bool, selectedVersion string) {
+func processDiff(vr vclResponse, debug bool, selectedVersion int) {
 	var (
 		err    error
 		cmdOut []byte
@@ -121,12 +122,12 @@ func processDiff(vr vclResponse, debug bool, selectedVersion string) {
 	cmd.Stdin = strings.NewReader(vr.Content)
 
 	if cmdOut, err = cmd.Output(); err != nil {
-		color.Red("\nThere was a difference between the version (%s) of '%s' and the version found locally\n\t%s\n", selectedVersion, vr.Name, vr.Path)
+		color.Red("\nThere was a difference between the version (%d) of '%s' and the version found locally\n\t%s\n", selectedVersion, vr.Name, vr.Path)
 
 		if debug == true {
 			fmt.Printf("\n%s\n", string(cmdOut))
 		}
 	} else {
-		color.Green("\nNo difference between the version (%s) of '%s' and the version found locally\n\t%s\n", selectedVersion, vr.Name, vr.Path)
+		color.Green("\nNo difference between the version (%d) of '%s' and the version found locally\n\t%s\n", selectedVersion, vr.Name, vr.Path)
 	}
 }

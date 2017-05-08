@@ -43,8 +43,8 @@ type vclResponse struct {
 	Error   bool
 }
 
-type fileProcessor func(string, string, *fastly.Client, chan vclResponse)
-type responseProcessor func(vclResponse, bool, string)
+type fileProcessor func(int, string, *fastly.Client, chan vclResponse)
+type responseProcessor func(vclResponse, bool, int)
 
 // function called by filepath.Walk
 func aggregate(path string, f os.FileInfo, err error) error {
@@ -102,7 +102,7 @@ func configureSkipMatch(f flags.Flags) {
 // the goroutine behaviour is provided by the caller
 // finally, it ranges over the buffered channel of data
 // each item in the channel is processed dependant on the caller provided function
-func processFiles(selectedVersion string, fp fileProcessor, rp responseProcessor, f flags.Flags, client *fastly.Client) {
+func processFiles(selectedVersion int, fp fileProcessor, rp responseProcessor, f flags.Flags, client *fastly.Client) {
 	walkError := filepath.Walk(*f.Top.Directory, aggregate)
 	if walkError != nil {
 		fmt.Printf("filepath.Walk() returned an error: %v\n", walkError)

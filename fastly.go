@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	"standalone"
+	"strconv"
 
 	fastly "github.com/sethvargo/go-fastly"
 	"github.com/sirupsen/logrus"
@@ -67,7 +68,13 @@ func main() {
 	}
 
 	if *f.Top.Status != "" {
-		status, err := standalone.GetStatusForVersion(*f.Top.Service, *f.Top.Status, client)
+		statusVersion, err := strconv.Atoi(*f.Top.Status)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		status, err := standalone.GetStatusForVersion(*f.Top.Service, statusVersion, client)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
@@ -82,7 +89,13 @@ func main() {
 	}
 
 	if *f.Top.Settings != "" {
-		standalone.PrintSettingsFor(*f.Top.Service, *f.Top.Settings, client)
+		settingsVersion, err := strconv.Atoi(*f.Top.Settings)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		standalone.PrintSettingsFor(*f.Top.Service, settingsVersion, client)
 		return
 	}
 

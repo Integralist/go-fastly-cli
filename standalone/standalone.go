@@ -41,16 +41,10 @@ func PrintLatestSettings(serviceID string, client *fastly.Client) {
 }
 
 // PrintSettingsFor sends the sepecified service version settings to stdout
-func PrintSettingsFor(serviceID, serviceVersion string, client *fastly.Client) {
-	v, err := strconv.Atoi(serviceVersion)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
+func PrintSettingsFor(serviceID string, serviceVersion int, client *fastly.Client) {
 	settings, err := client.GetSettings(&fastly.GetSettingsInput{
 		Service: serviceID,
-		Version: v,
+		Version: serviceVersion,
 	})
 	if err != nil {
 		fmt.Printf("\nThere was a problem getting the settings for version %s\n\n%s", common.Yellow(serviceVersion), common.Red(err))
@@ -80,16 +74,10 @@ func GetLatestServiceVersionStatus(serviceID string, client *fastly.Client) (str
 }
 
 // GetStatusForVersion returns the status of the specified Fastly service version
-func GetStatusForVersion(serviceID, statusVersion string, client *fastly.Client) (string, error) {
-	v, err := strconv.Atoi(statusVersion)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
+func GetStatusForVersion(serviceID string, statusVersion int, client *fastly.Client) (string, error) {
 	versionStatus, err := client.GetVersion(&fastly.GetVersionInput{
 		Service: serviceID,
-		Version: v,
+		Version: statusVersion,
 	})
 	if err != nil {
 		msg := "\nThere was a problem getting the status for version %s\n\n%s\n\n"
