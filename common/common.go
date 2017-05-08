@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"sort"
 	"strconv"
 
@@ -42,7 +43,7 @@ func GetLatestVCLVersion(serviceID string, client *fastly.Client) (string, error
 		Service: serviceID,
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("There was a problem getting the version list:\n\n%s", Red(err))
 	}
 
 	wv := wrappedVersions{}
