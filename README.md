@@ -164,3 +164,4 @@ fastly upload
 * Test Suite
 * Ability to diff two remote services (not just local against a remote)
 * Ability to upload an individual file (not just pattern matched list of files)
+* Ability to display all available services (along with their ID)
