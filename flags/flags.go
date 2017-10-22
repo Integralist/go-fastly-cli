@@ -18,7 +18,7 @@ func init() {
 
 // TopLevelFlags defines the common settings across all commands
 type TopLevelFlags struct {
-	Help, Debug, Version                                               *bool
+	Help, HelpShort, Debug, Version                                    *bool
 	Token, Service, Directory, Match, Skip, Status, Activate, Settings *string
 	Diff, Upload                                                       *flag.FlagSet
 }
@@ -45,6 +45,7 @@ func New() Flags {
 		Diff:      flag.NewFlagSet("diff", flag.ExitOnError),
 		Directory: flag.String("dir", os.Getenv("VCL_DIRECTORY"), "vcl directory to compare files against"),
 		Help:      flag.Bool("help", false, "show available flags"),
+		HelpShort: flag.Bool("h", false, "show available flags"),
 		Match:     flag.String("match", "", "regex for matching vcl directories (will also try: VCL_MATCH_PATH)"),
 		Service:   flag.String("service", os.Getenv("FASTLY_SERVICE_ID"), "your service id (fallback: FASTLY_SERVICE_ID)"),
 		Settings:  flag.String("settings", "", "get settings (Default TTL & Host) for specified Fastly service version (version number or latest)"),

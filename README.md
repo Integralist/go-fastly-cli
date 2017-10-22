@@ -31,7 +31,7 @@ fastly -help
         show any debug logs and subcommand specific information
   -dir string
         the directory where your vcl files are located
-  -help
+  -help, -h
         show available flags
   -match string
         regex for matching vcl directories (fallback: VCL_MATCH_PATH)

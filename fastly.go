@@ -27,12 +27,26 @@ func init() {
 	})
 }
 
+func printSubCommands() {
+	diff := "\n  fastly diff\n\tview a diff between your local files and the remote versions\n\te.g. fastly diff -version 123"
+	upload := "\n\n  fastly upload\n\tupload local files to your remote service version\n\te.g. fastly upload -version 123"
+	divider := "\n\n -------------------------------------------------------------------\n\n"
+	fmt.Printf("%s%s%s", diff, upload, divider)
+}
+
 func main() {
 	f := flags.New()
 
+	if len(os.Args) < 2 {
+		printSubCommands()
+		flag.PrintDefaults()
+		os.Exit(1)
+	}
+
 	logger.Debug("flags initialised, application starting")
 
-	if *f.Top.Help == true {
+	if *f.Top.Help == true || *f.Top.HelpShort == true {
+		printSubCommands()
 		flag.PrintDefaults()
 		os.Exit(1)
 	}
