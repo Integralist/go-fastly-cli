@@ -1,13 +1,14 @@
 package commands
 
 import (
-	"flags"
 	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 	"sync"
+
+	"github.com/integralist/go-fastly-cli/flags"
 
 	fastly "github.com/sethvargo/go-fastly"
 	"github.com/sirupsen/logrus"

@@ -15,7 +15,10 @@ remove_vim_files:
 remove_compiled_files:
 	@rm ./fastly.{darwin,linux,windows.exe} &> /dev/null || true
 
-clean: remove_vim_files remove_compiled_files
+remove_github_dir:
+	@rm -rf ./github.com &> /dev/null || true
+
+clean: remove_vim_files remove_compiled_files remove_github_dir
 	@docker rmi -f $(container_env) &> /dev/null || true
 	@docker rmi -f $(container_compiler) &> /dev/null || true
 
@@ -27,7 +30,7 @@ build: copy_vim_files
 
 dev: build remove_vim_files
 	@docker run -it \
-		-v "$$(pwd)":/go/src \
+		-v "$$(pwd)":/go/src/github.com/integralist/go-fastly-cli/ \
 		-v "${VCL_DIRECTORY}":${VCL_DIRECTORY} \
 		-e FASTLY_API_TOKEN="${FASTLY_API_TOKEN}" \
 		-e FASTLY_SERVICE_ID="${FASTLY_SERVICE_ID}" \
@@ -40,7 +43,7 @@ rebuild: clean run
 
 compile:
 	@docker build -t $(container_compiler) -f ./Dockerfile-compile .
-	@docker run -it -v "$$(pwd)":/go/src $(container_compiler) || true
+	@docker run -it -v "$$(pwd)":/go/src/github.com/integralist/go-fastly-cli/ $(container_compiler) || true
 
 copy_binary:
 	cp ./fastly.darwin $(bin)

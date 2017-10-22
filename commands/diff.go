@@ -1,13 +1,14 @@
 package commands
 
 import (
-	"common"
-	"flags"
 	"fmt"
 	"os"
 	"os/exec"
 	"strconv"
 	"strings"
+
+	"github.com/integralist/go-fastly-cli/common"
+	"github.com/integralist/go-fastly-cli/flags"
 
 	"github.com/fatih/color"
 	fastly "github.com/sethvargo/go-fastly"

@@ -10,6 +10,9 @@ CLI tool for uploading and diffing local/remote Fastly VCL
 go get github.com/integralist/go-fastly-cli
 ```
 
+> then execute `gpm install` ([gpm](https://github.com/pote/gpm))  
+> this will ensure correct dependencies are checked out
+
 ## Usage
 
 ```bash

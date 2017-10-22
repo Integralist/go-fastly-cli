@@ -1,13 +1,14 @@
 package main
 
 import (
-	"commands"
 	"flag"
-	"flags"
 	"fmt"
 	"os"
-	"standalone"
 	"strconv"
+
+	"github.com/integralist/go-fastly-cli/commands"
+	"github.com/integralist/go-fastly-cli/flags"
+	"github.com/integralist/go-fastly-cli/standalone"
 
 	fastly "github.com/sethvargo/go-fastly"
 	"github.com/sirupsen/logrus"
