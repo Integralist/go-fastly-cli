@@ -141,16 +141,36 @@ func uploadVCL(selectedVersion int, path string, client *fastly.Client, ch chan 
 			Error:   true,
 		}
 	} else {
-		vclFile, err := client.CreateVCL(&fastly.CreateVCLInput{
+		// First check if the local file exists already on the remote
+		_, err := client.GetVCL(&fastly.GetVCLInput{
 			Service: fastlyServiceID,
 			Version: selectedVersion,
 			Name:    name,
-			Content: content,
 		})
 
 		if err != nil {
-			fmt.Printf("There was an error creating the file '%s':\n%s\nWe'll now try updating this file instead of creating it\n\n", common.Yellow(name), common.Red(err))
+			// If the file DOESNT exist, then we'll create it
+			fmt.Printf("\n%+v\n> will attempt to create the file %s.vcl\n\n", err, name)
 
+			vclFile, err := client.CreateVCL(&fastly.CreateVCLInput{
+				Service: fastlyServiceID,
+				Version: selectedVersion,
+				Name:    name,
+				Content: content,
+			})
+
+			if err != nil {
+				fmt.Printf("There was an error creating the file '%s':\n%s\n\n", common.Yellow(name), common.Red(err))
+			} else {
+				ch <- vclResponse{
+					Path:    path,
+					Name:    name,
+					Content: vclFile.Content,
+					Error:   false,
+				}
+			}
+		} else {
+			// If the file DOES exist, then we'll upload our version on top of it
 			vclFileUpdate, updateErr := client.UpdateVCL(&fastly.UpdateVCLInput{
 				Service: fastlyServiceID,
 				Version: selectedVersion,
@@ -172,13 +192,6 @@ func uploadVCL(selectedVersion int, path string, client *fastly.Client, ch chan 
 					Error:   false,
 				}
 			}
-		} else {
-			ch <- vclResponse{
-				Path:    path,
-				Name:    name,
-				Content: vclFile.Content,
-				Error:   false,
-			}
 		}
 	}
 }
@@ -193,8 +206,8 @@ func getLocalVCL(path string) (string, error) {
 
 func handleResponse(vr vclResponse, debug bool, selectedVersion int) {
 	if vr.Error {
-		fmt.Printf("Whoops, the file '%s' didn't upload to version '%d' because of the following error:\n\t%s\n\n", common.Yellow(vr.Name), selectedVersion, common.Red(vr.Content))
+		fmt.Printf("The file '%s' didn't upload to version '%d' because of the following error:\n\t%s\n\n", common.Yellow(vr.Name), selectedVersion, common.Red(vr.Content))
 	} else {
-		fmt.Printf("Yay, the file '%s' in version '%s' was updated successfully\n", common.Green(vr.Name), common.Yellow(selectedVersion))
+		fmt.Printf("The file '%s' in version '%s' was updated successfully\n", common.Green(vr.Name), common.Yellow(selectedVersion))
 	}
 }
