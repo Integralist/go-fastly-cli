@@ -20,12 +20,13 @@ func init() {
 type TopLevelFlags struct {
 	Help, HelpShort, Debug, Version                                    *bool
 	Token, Service, Directory, Match, Skip, Status, Activate, Settings *string
-	Diff, Upload                                                       *flag.FlagSet
+	Diff, List, Upload                                                 *flag.FlagSet
 }
 
 // SubCommandFlags defines the settings for the subcommands
 type SubCommandFlags struct {
 	VclVersion       *string
+	VclListVersion   *string
 	UseLatestVersion *bool
 	CloneVersion     *string
 	UploadVersion    *string
@@ -40,12 +41,13 @@ type Flags struct {
 // New returns defined flags
 func New() Flags {
 	topLevelFlags := TopLevelFlags{
-		Activate:  flag.String("activate", "", "specify Fastly service 'version' to activate"),
+		Activate:  flag.String("activate", "", "specify Fastly service version to activate"),
 		Debug:     flag.Bool("debug", false, "show any error/diff output + debug logs"),
 		Diff:      flag.NewFlagSet("diff", flag.ExitOnError),
 		Directory: flag.String("dir", os.Getenv("VCL_DIRECTORY"), "vcl directory to compare files against"),
 		Help:      flag.Bool("help", false, "show available flags"),
 		HelpShort: flag.Bool("h", false, "show available flags"),
+		List:      flag.NewFlagSet("list", flag.ExitOnError),
 		Match:     flag.String("match", "", "regex for matching vcl directories (will also try: VCL_MATCH_PATH)"),
 		Service:   flag.String("service", os.Getenv("FASTLY_SERVICE_ID"), "your service id (fallback: FASTLY_SERVICE_ID)"),
 		Settings:  flag.String("settings", "", "get settings (Default TTL & Host) for specified Fastly service version (version number or latest)"),
@@ -66,10 +68,11 @@ func New() Flags {
 
 func subCommands(t TopLevelFlags) SubCommandFlags {
 	return SubCommandFlags{
-		CloneVersion:     t.Upload.String("clone", "", "specify Fastly service 'version' to clone from before uploading to"),
+		CloneVersion:     t.Upload.String("clone", "", "specify Fastly service version to clone from before uploading to"),
 		UploadVersion:    t.Upload.String("version", "", "specify non-active Fastly service 'version' to upload to"),
 		UseLatestVersion: t.Upload.Bool("latest", false, "use latest Fastly service version to upload to (presumes not activated)"),
-		VclVersion:       t.Diff.String("version", "", "specify Fastly service 'version' to verify against"),
+		VclVersion:       t.Diff.String("version", "", "specify Fastly service version to verify against"),
+		VclListVersion:   t.List.String("version", "", "specify Fastly service version to list VCL files from"),
 	}
 }
 
@@ -90,7 +93,7 @@ func Check(args []string) (string, int) {
 			continue
 		}
 
-		if arg == "diff" || arg == "upload" {
+		if arg == "diff" || arg == "list" || arg == "upload" {
 			subcommandSeen = true
 		} else {
 			counter++

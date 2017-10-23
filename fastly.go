@@ -29,9 +29,10 @@ func init() {
 
 func printSubCommands() {
 	diff := "\n  fastly diff\n\tview a diff between your local files and the remote versions\n\te.g. fastly diff -version 123"
+	list := "\n\n  fastly list\n\tlist all vcl files found within specified remote service version\n\te.g. fastly list -version 123"
 	upload := "\n\n  fastly upload\n\tupload local files to your remote service version\n\te.g. fastly upload -version 123"
 	divider := "\n\n -------------------------------------------------------------------\n\n"
-	fmt.Printf("%s%s%s", diff, upload, divider)
+	fmt.Printf("%s%s%s%s", diff, list, upload, divider)
 }
 
 func main() {
@@ -121,6 +122,9 @@ func main() {
 	case "diff":
 		f.Top.Diff.Parse(args[counter:])
 		commands.Diff(f, client)
+	case "list":
+		f.Top.List.Parse(args[counter:])
+		commands.List(f, client)
 	case "upload":
 		f.Top.Upload.Parse(args[counter:])
 		commands.Upload(f, client)

@@ -1,6 +1,12 @@
 # go-fastly-cli
 
-CLI tool for uploading and diffing local/remote Fastly VCL
+CLI tool for:
+
+* Uploading local VCL to Fastly.
+* Diffing local VCL with remote Fastly VCL.
+* Listing remote Fastly VCL files.
+
+This tool is an additional abstraction layer built ontop of "[go-fastly](https://github.com/sethvargo/go-fastly)".
 
 > Note: this supersedes the individual tools: [ero](https://github.com/Integralist/ero) and [lataa](https://github.com/Integralist/lataa)
 
@@ -18,6 +24,7 @@ go get github.com/integralist/go-fastly-cli
 ```bash
 fastly <flags> [diff <options>]
 fastly <flags> [upload <options>]
+fastly <flags> [list <options>]
 ```
 
 Flags:
@@ -71,6 +78,16 @@ Usage of upload:
         use latest Fastly service version to upload to (presumes not activated)
   -version string
         specify non-active Fastly service version to upload to
+```
+
+List Options:
+
+```bash
+fastly list -help
+
+Usage of list:
+  -version string
+        specify Fastly service version to list VCL files from
 ```
 
 ## Environment Variables
@@ -135,6 +152,12 @@ fastly -settings 123
 # activate specified service version
 fastly -activate 123
 
+# view latest version of remote service vcl files
+fastly list
+
+# view version 123 of remote service vcl files
+fastly list -version 123
+
 # diff local vcl files against the lastest remote versions
 fastly diff
 
@@ -164,8 +187,11 @@ fastly upload
 
 ## TODO
 
+* Ability to delete individual files
 * Ability to 'dry run' a command (to see what files are affected, e.g. what files will be uploaded and where)
 * Ability to diff two remote services (not just local against a remote)
-* Ability to upload an individual file (not just pattern matched list of files)
+* Ability to upload individual files (not just pattern matched list of files)
 * Ability to display all available services (along with their ID)
+* Better diffing tool than linux `diff` command
+* Setup for homebrew install
 * Test Suite
