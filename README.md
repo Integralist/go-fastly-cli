@@ -5,8 +5,9 @@ CLI tool for:
 * Uploading local VCL to Fastly.
 * Diffing local VCL with remote Fastly VCL.
 * Listing remote Fastly VCL files.
+* Deleting remote Fastly VCL files.
 
-This tool is an additional abstraction layer built ontop of "[go-fastly](https://github.com/sethvargo/go-fastly)".
+This tool is an abstraction layer built on top of "[go-fastly](https://github.com/sethvargo/go-fastly)".
 
 > Note: this supersedes the individual tools: [ero](https://github.com/Integralist/ero) and [lataa](https://github.com/Integralist/lataa)
 
@@ -25,6 +26,7 @@ go get github.com/integralist/go-fastly-cli
 fastly <flags> [diff <options>]
 fastly <flags> [upload <options>]
 fastly <flags> [list <options>]
+fastly <flags> [delete <options>]
 ```
 
 Flags:
@@ -88,6 +90,18 @@ fastly list -help
 Usage of list:
   -version string
         specify Fastly service version to list VCL files from
+```
+
+Delete Options:
+
+```bash
+fastly delete -help
+
+Usage of delete:
+  -name string
+        specify VCL filename to delete
+  -version string
+        specify Fastly service version to delete VCL files from
 ```
 
 ## Environment Variables
@@ -158,6 +172,12 @@ fastly list
 # view version 123 of remote service vcl files
 fastly list -version 123
 
+# delete specified vcl file from latest version of remote service
+fastly delete -name test_file
+
+# delete specified vcl file from specific version of remote service
+fastly delete -name test_file -version 123
+
 # diff local vcl files against the lastest remote versions
 fastly diff
 
@@ -187,7 +207,6 @@ fastly upload
 
 ## TODO
 
-* Ability to delete individual files
 * Ability to 'dry run' a command (to see what files are affected, e.g. what files will be uploaded and where)
 * Ability to diff two remote services (not just local against a remote)
 * Ability to upload individual files (not just pattern matched list of files)

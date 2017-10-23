@@ -28,11 +28,12 @@ func init() {
 }
 
 func printSubCommands() {
-	diff := "\n  fastly diff\n\tview a diff between your local files and the remote versions\n\te.g. fastly diff -version 123"
-	list := "\n\n  fastly list\n\tlist all vcl files found within specified remote service version\n\te.g. fastly list -version 123"
-	upload := "\n\n  fastly upload\n\tupload local files to your remote service version\n\te.g. fastly upload -version 123"
-	divider := "\n\n -------------------------------------------------------------------\n\n"
-	fmt.Printf("%s%s%s%s", diff, list, upload, divider)
+	delete := "\n  fastly delete\n\tdelete a specific vcl file from the remote service\n\te.g. fastly diff -name test_file -version 123\n"
+	diff := "\n  fastly diff\n\tview a diff between your local files and the remote versions\n\te.g. fastly diff -version 123\n"
+	list := "\n  fastly list\n\tlist all vcl files found within specified remote service version\n\te.g. fastly list -version 123\n"
+	upload := "\n  fastly upload\n\tupload local files to your remote service version\n\te.g. fastly upload -version 123\n"
+	divider := "\n -------------------------------------------------------------------\n\n"
+	fmt.Printf("%s%s%s%s%s", list, delete, diff, upload, divider)
 }
 
 func main() {
@@ -119,6 +120,9 @@ func main() {
 	arg, counter := flags.Check(args)
 
 	switch arg {
+	case "delete":
+		f.Top.Delete.Parse(args[counter:])
+		commands.Delete(f, client)
 	case "diff":
 		f.Top.Diff.Parse(args[counter:])
 		commands.Diff(f, client)

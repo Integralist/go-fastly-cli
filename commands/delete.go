@@ -11,16 +11,23 @@ import (
 	fastly "github.com/sethvargo/go-fastly"
 )
 
-// List all VCL files found in the remote service version
-func List(f flags.Flags, client *fastly.Client) {
+// Delete specified VCL file in the remote service version
+func Delete(f flags.Flags, client *fastly.Client) {
 	var serviceVersion string
 	var selectedVersion int
 
-	listVersion := *f.Sub.VclListVersion
+	deleteVCL := *f.Sub.VclName
+
+	if deleteVCL == "" {
+		fmt.Println("You must provide a VCL name\n  e.g. -name test_file")
+		os.Exit(1)
+	}
+
+	deleteVersion := *f.Sub.VclDeleteVersion
 	fastlyServiceID = *f.Top.Service
 
-	if listVersion != "" {
-		serviceVersion = listVersion
+	if deleteVersion != "" {
+		serviceVersion = deleteVersion
 	} else {
 		var err error
 		selectedVersion, err = common.GetLatestVCLVersion(fastlyServiceID, client)
@@ -33,7 +40,7 @@ func List(f flags.Flags, client *fastly.Client) {
 
 	// If we're not the type default, then we have the latest service version
 	if selectedVersion != 0 {
-		fmt.Println("You didn't provide a specific service version, so we'll use the latest one")
+		fmt.Printf("You didn't provide a specific service version, so we'll use the latest one: %s\n", common.Yellow(selectedVersion))
 	} else {
 		// Otherwise the user provided a service version, which we need to convert
 		var err error
@@ -44,18 +51,15 @@ func List(f flags.Flags, client *fastly.Client) {
 		}
 	}
 
-	vclFiles, err := client.ListVCLs(&fastly.ListVCLsInput{
+	err := client.DeleteVCL(&fastly.DeleteVCLInput{
 		Service: fastlyServiceID,
 		Version: selectedVersion,
+		Name:    deleteVCL,
 	})
-	if err != nil {
-		fmt.Printf("Unable to retrieve list of VCL files for version: %s", common.Yellow(selectedVersion))
-		os.Exit(1)
-	}
 
-	fmt.Printf("VCL files found for service version: %s\n\n", common.Yellow(selectedVersion))
-	for _, f := range vclFiles {
-		fmt.Printf("  * %v\n", f.Name)
+	if err != nil {
+		fmt.Printf("\nUnable to delete the specified VCL file from version: %s\n\n", common.Yellow(selectedVersion))
+		fmt.Printf("Error:\n%s", common.Red(err))
 	}
 
 	os.Exit(1)

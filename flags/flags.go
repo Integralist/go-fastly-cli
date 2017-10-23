@@ -20,16 +20,18 @@ func init() {
 type TopLevelFlags struct {
 	Help, HelpShort, Debug, Version                                    *bool
 	Token, Service, Directory, Match, Skip, Status, Activate, Settings *string
-	Diff, List, Upload                                                 *flag.FlagSet
+	Delete, Diff, List, Upload                                         *flag.FlagSet
 }
 
 // SubCommandFlags defines the settings for the subcommands
 type SubCommandFlags struct {
-	VclVersion       *string
-	VclListVersion   *string
-	UseLatestVersion *bool
 	CloneVersion     *string
 	UploadVersion    *string
+	UseLatestVersion *bool
+	VclDeleteVersion *string
+	VclListVersion   *string
+	VclName          *string
+	VclVersion       *string
 }
 
 // Flags defines type of structure returned to user
@@ -43,6 +45,7 @@ func New() Flags {
 	topLevelFlags := TopLevelFlags{
 		Activate:  flag.String("activate", "", "specify Fastly service version to activate"),
 		Debug:     flag.Bool("debug", false, "show any error/diff output + debug logs"),
+		Delete:    flag.NewFlagSet("delete", flag.ExitOnError),
 		Diff:      flag.NewFlagSet("diff", flag.ExitOnError),
 		Directory: flag.String("dir", os.Getenv("VCL_DIRECTORY"), "vcl directory to compare files against"),
 		Help:      flag.Bool("help", false, "show available flags"),
@@ -71,8 +74,10 @@ func subCommands(t TopLevelFlags) SubCommandFlags {
 		CloneVersion:     t.Upload.String("clone", "", "specify Fastly service version to clone from before uploading to"),
 		UploadVersion:    t.Upload.String("version", "", "specify non-active Fastly service 'version' to upload to"),
 		UseLatestVersion: t.Upload.Bool("latest", false, "use latest Fastly service version to upload to (presumes not activated)"),
-		VclVersion:       t.Diff.String("version", "", "specify Fastly service version to verify against"),
+		VclDeleteVersion: t.Delete.String("version", "", "specify Fastly service version to delete VCL file from"),
 		VclListVersion:   t.List.String("version", "", "specify Fastly service version to list VCL files from"),
+		VclName:          t.Delete.String("name", "", "specify VCL filename to delete"),
+		VclVersion:       t.Diff.String("version", "", "specify Fastly service version to verify against"),
 	}
 }
 
@@ -93,7 +98,7 @@ func Check(args []string) (string, int) {
 			continue
 		}
 
-		if arg == "diff" || arg == "list" || arg == "upload" {
+		if arg == "delete" || arg == "diff" || arg == "list" || arg == "upload" {
 			subcommandSeen = true
 		} else {
 			counter++
