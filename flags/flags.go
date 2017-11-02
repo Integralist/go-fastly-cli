@@ -18,9 +18,9 @@ func init() {
 
 // TopLevelFlags defines the common settings across all commands
 type TopLevelFlags struct {
-	Help, HelpShort, Debug, Version                                    *bool
-	Token, Service, Directory, Match, Skip, Status, Activate, Settings *string
-	Delete, Diff, List, Upload                                         *flag.FlagSet
+	Help, HelpShort, Debug, Version                                              *bool
+	Token, Service, Directory, Match, Skip, Status, Activate, Validate, Settings *string
+	Delete, Diff, List, Upload                                                   *flag.FlagSet
 }
 
 // SubCommandFlags defines the settings for the subcommands
@@ -58,6 +58,7 @@ func New() Flags {
 		Status:    flag.String("status", "", "retrieve status for the specified Fastly service 'version' (try: 'latest')"),
 		Token:     flag.String("token", os.Getenv("FASTLY_API_TOKEN"), "your fastly api token (fallback: FASTLY_API_TOKEN)"),
 		Upload:    flag.NewFlagSet("upload", flag.ExitOnError),
+		Validate:  flag.String("validate", "", "specify Fastly service version to validate"),
 		Version:   flag.Bool("version", false, "show application version"),
 	}
 

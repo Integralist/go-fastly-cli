@@ -15,7 +15,7 @@ import (
 )
 
 // appVersion is the application version
-const appVersion = "0.0.1"
+const appVersion = "0.0.2"
 
 var logger *logrus.Entry
 
@@ -70,6 +70,11 @@ func main() {
 
 	if *f.Top.Activate != "" {
 		standalone.ActivateVersion(f, client)
+		return
+	}
+
+	if *f.Top.Validate != "" {
+		standalone.ValidateVersion(f, client)
 		return
 	}
 

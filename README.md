@@ -6,6 +6,7 @@ CLI tool for:
 * Diffing local VCL with remote Fastly VCL.
 * Listing remote Fastly VCL files.
 * Deleting remote Fastly VCL files.
+* Creating, Activating and Validating Fastly service versions.
 
 This tool is an abstraction layer built on top of "[go-fastly](https://github.com/sethvargo/go-fastly)".
 
@@ -54,6 +55,8 @@ fastly -help
         get status for the specified Fastly service version (try: 'latest')
   -token string
         your fastly api token (fallback: FASTLY_API_TOKEN) 
+  -validate string
+        specify Fastly service version to validate
   -version
         show application version
 ```
@@ -162,6 +165,9 @@ fastly -settings latest
 
 # view settings for the specified service version
 fastly -settings 123
+
+# validate specified service version
+fastly -validate 123
 
 # activate specified service version
 fastly -activate 123

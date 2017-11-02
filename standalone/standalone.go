@@ -30,6 +30,35 @@ func ActivateVersion(f flags.Flags, client *fastly.Client) {
 	fmt.Printf("\nService '%s' now has version '%s' activated\n\n", common.Yellow(*f.Top.Service), common.Green(*f.Top.Activate))
 }
 
+// ValidateVersion validates the specified Fastly service version
+func ValidateVersion(f flags.Flags, client *fastly.Client) {
+	v, err := strconv.Atoi(*f.Top.Validate)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	valid, msg, err := client.ValidateVersion(&fastly.ValidateVersionInput{
+		Service: *f.Top.Service,
+		Version: v,
+	})
+	if err != nil {
+		fmt.Printf("\nThere was a problem validating version %s\n\n%s", common.Yellow(*f.Top.Validate), common.Red(err))
+		os.Exit(1)
+	}
+
+	var validColour, details string
+
+	validColour = common.Green(valid)
+
+	if valid == false {
+		validColour = common.Red(valid)
+		details = common.Red(msg)
+	}
+
+	fmt.Printf("\nService '%s' valid? %s\n\n%s", common.Yellow(*f.Top.Service), validColour, details)
+}
+
 // PrintLatestSettings sends the sepecified service version settings to stdout
 func PrintLatestSettings(serviceID string, client *fastly.Client) {
 	latestVersion, err := common.GetLatestVCLVersion(serviceID, client)
