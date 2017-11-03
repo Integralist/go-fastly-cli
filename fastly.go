@@ -15,7 +15,7 @@ import (
 )
 
 // appVersion is the application version
-const appVersion = "0.0.2"
+const appVersion = "0.0.3"
 
 var logger *logrus.Entry
 
@@ -28,7 +28,7 @@ func init() {
 }
 
 func printSubCommands() {
-	delete := "\n  fastly delete\n\tdelete a specific vcl file from the remote service\n\te.g. fastly diff -name test_file -version 123\n"
+	delete := "\n  fastly delete\n\tdelete a specific vcl file from the remote service\n\te.g. fastly delete -name test_file -version 123\n"
 	diff := "\n  fastly diff\n\tview a diff between your local files and the remote versions\n\te.g. fastly diff -version 123\n"
 	list := "\n  fastly list\n\tlist all vcl files found within specified remote service version\n\te.g. fastly list -version 123\n"
 	upload := "\n  fastly upload\n\tupload local files to your remote service version\n\te.g. fastly upload -version 123\n"
