@@ -10,16 +10,13 @@ CLI tool for:
 
 This tool is an abstraction layer built on top of "[go-fastly](https://github.com/sethvargo/go-fastly)".
 
-> Note: this supersedes the individual tools: [ero](https://github.com/Integralist/ero) and [lataa](https://github.com/Integralist/lataa)
-
 ## Install
 
 ```bash
 go get github.com/integralist/go-fastly-cli
 ```
 
-> then execute `gpm install` ([gpm](https://github.com/pote/gpm))  
-> this will ensure correct dependencies are checked out
+> GOOS=darwin GOARCH=386 go build fastly.go
 
 ## Usage
 
@@ -213,7 +210,6 @@ fastly upload
 
 ## TODO
 
-* Ability to list remote VCL files
 * Ability to 'dry run' a command (to see what files are affected, e.g. what files will be uploaded and where)
 * Ability to diff two remote services (not just local against a remote)
 * Ability to upload individual files (not just pattern matched list of files)
