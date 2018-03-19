@@ -120,32 +120,6 @@ Below is a list of environment variables this tool supports:
 
 > Use the relevant CLI flags to override these values
 
-## Makefile
-
-To compile binaries for multiple OS architectures:
-
-```bash
-make compile
-```
-
-To start up a dockerized development environment (inc. Vim):
-
-```bash
-make dev
-```
-
-To install a local binary for testing (darwin):
-
-```bash
-make install
-```
-
-To remove all compiled binaries, vim files and containers:
-
-```bash
-make clean
-```
-
 ## Examples
 
 > Note: all examples presume `FASTLY_API_TOKEN`/`FASTLY_SERVICE_ID` env vars set
@@ -198,6 +172,9 @@ fastly upload -version 123
 # token and service explicitly set to override env vars
 fastly -service xxx -token xxx upload -version 123
 
+# modify VCL directory temporarily + use different token/service id
+VCL_MATCH_PATH=foo fastly -token $FASTLY_API_TOKEN_FOO -service $FASTLY_SERVICE_ID_FOO diff
+
 # clone specified service version and upload local files to it
 fastly upload -clone 123
 
@@ -206,6 +183,32 @@ fastly upload -latest
 
 # clone latest service version available and upload local files to it
 fastly upload
+```
+
+## Makefile
+
+To compile binaries for multiple OS architectures:
+
+```bash
+make compile
+```
+
+To start up a dockerized development environment (inc. Vim):
+
+```bash
+make dev
+```
+
+To install a local binary for testing (darwin):
+
+```bash
+make install
+```
+
+To remove all compiled binaries, vim files and containers:
+
+```bash
+make clean
 ```
 
 ## TODO
