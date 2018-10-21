@@ -26,16 +26,19 @@ func init() {
 	})
 }
 
+func showHelp(f flags.Flags) bool {
+	if len(os.Args) < 2 || *f.Top.Help == true || *f.Top.HelpShort == true {
+		return true
+	}
+	return false
+}
+
 func main() {
 	f := flags.New()
 
 	logger.Debug("flags initialised, application starting")
 
-	if len(os.Args) < 2 {
-		f.Help()
-	}
-
-	if *f.Top.Help == true || *f.Top.HelpShort == true {
+	if showHelp(f) {
 		f.Help()
 	}
 
