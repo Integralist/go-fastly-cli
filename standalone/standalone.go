@@ -9,44 +9,44 @@ import (
 	"strconv"
 
 	"github.com/integralist/go-fastly-cli/common"
-	"github.com/integralist/go-fastly-cli/flags"
 
 	fastly "github.com/sethvargo/go-fastly"
 )
 
 // ActivateVersion activates the specified Fastly service version
-func ActivateVersion(f flags.Flags, client *fastly.Client) {
-	v, err := strconv.Atoi(*f.Top.Activate)
+func ActivateVersion(version, service string, client *fastly.Client) {
+	v, err := strconv.Atoi(version)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	_, err = client.ActivateVersion(&fastly.ActivateVersionInput{
-		Service: *f.Top.Service,
+		Service: service,
 		Version: v,
 	})
 	if err != nil {
-		fmt.Printf("\nThere was a problem activating version %s\n\n%s", common.Yellow(*f.Top.Activate), common.Red(err))
+		fmt.Printf("\nThere was a problem activating version %s\n\n%s", common.Yellow(version), common.Red(err))
 		os.Exit(1)
 	}
-	fmt.Printf("\nService '%s' now has version '%s' activated\n\n", common.Yellow(*f.Top.Service), common.Green(*f.Top.Activate))
+
+	fmt.Printf("\nService '%s' now has version '%s' activated\n\n", common.Yellow(service), common.Green(version))
 }
 
 // ValidateVersion validates the specified Fastly service version
-func ValidateVersion(f flags.Flags, client *fastly.Client) {
-	v, err := strconv.Atoi(*f.Top.Validate)
+func ValidateVersion(version, service string, client *fastly.Client) {
+	v, err := strconv.Atoi(version)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
 
 	valid, msg, err := client.ValidateVersion(&fastly.ValidateVersionInput{
-		Service: *f.Top.Service,
+		Service: service,
 		Version: v,
 	})
 	if err != nil {
-		fmt.Printf("\nThere was a problem validating version %s\n\n%s", common.Yellow(*f.Top.Validate), common.Red(err))
+		fmt.Printf("\nThere was a problem validating version %s\n\n%s", common.Yellow(version), common.Red(err))
 		os.Exit(1)
 	}
 
@@ -59,7 +59,7 @@ func ValidateVersion(f flags.Flags, client *fastly.Client) {
 		details = common.Red(msg)
 	}
 
-	fmt.Printf("\nService '%s' valid? %s\n\n%s", common.Yellow(*f.Top.Service), validColour, details)
+	fmt.Printf("\nService '%s' valid? %s\n\n%s", common.Yellow(service), validColour, details)
 }
 
 // PrintLatestSettings sends the sepecified service version settings to stdout

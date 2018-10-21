@@ -58,12 +58,12 @@ func main() {
 	}
 
 	if *f.Top.Activate != "" {
-		standalone.ActivateVersion(f, client)
+		standalone.ActivateVersion(*f.Top.Activate, *f.Top.Service, client)
 		return
 	}
 
 	if *f.Top.Validate != "" {
-		standalone.ValidateVersion(f, client)
+		standalone.ValidateVersion(*f.Top.Validate, *f.Top.Service, client)
 		return
 	}
 
