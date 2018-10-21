@@ -1,3 +1,5 @@
+// Common is a package containing functions that used across mutliple packages.
+
 package common
 
 import (

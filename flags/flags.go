@@ -1,3 +1,6 @@
+// Flags is a package that defines the various flags that can be specified to
+// control how the application behaves.
+
 package flags
 
 import (

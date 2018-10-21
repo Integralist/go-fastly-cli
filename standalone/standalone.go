@@ -1,3 +1,6 @@
+// Standalone is a package that defines behaviour which relies on a single top
+// level flag, and not nested flags or sub commands.
+
 package standalone
 
 import (
