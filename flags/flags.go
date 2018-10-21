@@ -2,6 +2,7 @@ package flags
 
 import (
 	"flag"
+	"fmt"
 	"os"
 	"strings"
 
@@ -38,6 +39,59 @@ type SubCommandFlags struct {
 type Flags struct {
 	Top TopLevelFlags
 	Sub SubCommandFlags
+}
+
+// Help displays help instructions
+func (f Flags) Help() {
+	fmt.Printf("\nFlags:\n\n")
+
+	flag.PrintDefaults()
+
+	divider := "\n -------------------------------------------------------------------\n\n"
+	delete := "\n  fastly delete\n\tdelete a specific vcl file from the remote service\n\te.g. fastly delete -name test_file -version 123\n"
+	diff := "\n  fastly diff\n\tview a diff between your local files and the remote versions\n\te.g. fastly diff -version 123\n"
+	list := "\n  fastly list\n\tlist all vcl files found within specified remote service version\n\te.g. fastly list -version 123\n"
+	upload := "\n  fastly upload\n\tupload local files to your remote service version\n\te.g. fastly upload -version 123\n"
+
+	fmt.Printf("%sExamples:\n\n%s%s%s%s", divider, list, delete, diff, upload)
+
+	os.Exit(1)
+}
+
+// Check determines if a flag was specified before the subcommand
+// then returns the subcommand argument value based on the correct index
+// followed by the index of where the subcommand's flags start in the args list
+func (f Flags) Check(args []string) (string, int) {
+	counter := 0
+	subcommandSeen := false
+
+	for _, arg := range args {
+		if subcommandSeen {
+			break
+		}
+
+		if strings.HasPrefix(arg, "-") == true {
+			counter++
+			continue
+		}
+
+		if arg == "delete" || arg == "diff" || arg == "list" || arg == "upload" {
+			subcommandSeen = true
+		} else {
+			counter++
+		}
+	}
+
+	subcommandFlagsIndex := counter + 1
+
+	logger.WithFields(logrus.Fields{
+		"args":       args,
+		"counter":    counter,
+		"subcommand": args[counter],
+		"index":      subcommandFlagsIndex,
+	}).Debug("subcommand selected")
+
+	return args[counter], subcommandFlagsIndex
 }
 
 // New returns defined flags
@@ -80,40 +134,4 @@ func subCommands(t TopLevelFlags) SubCommandFlags {
 		VclName:          t.Delete.String("name", "", "specify VCL filename to delete"),
 		VclVersion:       t.Diff.String("version", "", "specify Fastly service version to verify against"),
 	}
-}
-
-// Check determines if a flag was specified before the subcommand
-// then returns the subcommand argument value based on the correct index
-// followed by the index of where the subcommand's flags start in the args list
-func Check(args []string) (string, int) {
-	counter := 0
-	subcommandSeen := false
-
-	for _, arg := range args {
-		if subcommandSeen {
-			break
-		}
-
-		if strings.HasPrefix(arg, "-") == true {
-			counter++
-			continue
-		}
-
-		if arg == "delete" || arg == "diff" || arg == "list" || arg == "upload" {
-			subcommandSeen = true
-		} else {
-			counter++
-		}
-	}
-
-	subcommandFlagsIndex := counter + 1
-
-	logger.WithFields(logrus.Fields{
-		"args":       args,
-		"counter":    counter,
-		"subcommand": args[counter],
-		"index":      subcommandFlagsIndex,
-	}).Debug("subcommand selected")
-
-	return args[counter], subcommandFlagsIndex
 }

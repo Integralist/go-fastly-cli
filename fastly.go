@@ -1,7 +1,6 @@
 package main
 
 import (
-	"flag"
 	"fmt"
 	"os"
 	"strconv"
@@ -27,30 +26,17 @@ func init() {
 	})
 }
 
-func printSubCommands() {
-	delete := "\n  fastly delete\n\tdelete a specific vcl file from the remote service\n\te.g. fastly delete -name test_file -version 123\n"
-	diff := "\n  fastly diff\n\tview a diff between your local files and the remote versions\n\te.g. fastly diff -version 123\n"
-	list := "\n  fastly list\n\tlist all vcl files found within specified remote service version\n\te.g. fastly list -version 123\n"
-	upload := "\n  fastly upload\n\tupload local files to your remote service version\n\te.g. fastly upload -version 123\n"
-	divider := "\n -------------------------------------------------------------------\n\n"
-	fmt.Printf("%s%s%s%s%s", list, delete, diff, upload, divider)
-}
-
 func main() {
 	f := flags.New()
 
-	if len(os.Args) < 2 {
-		printSubCommands()
-		flag.PrintDefaults()
-		os.Exit(1)
-	}
-
 	logger.Debug("flags initialised, application starting")
 
+	if len(os.Args) < 2 {
+		f.Help()
+	}
+
 	if *f.Top.Help == true || *f.Top.HelpShort == true {
-		printSubCommands()
-		flag.PrintDefaults()
-		os.Exit(1)
+		f.Help()
 	}
 
 	if *f.Top.Version == true {
@@ -122,7 +108,7 @@ func main() {
 	}
 
 	args := os.Args[1:] // strip first arg `fastly`
-	arg, counter := flags.Check(args)
+	arg, counter := f.Check(args)
 
 	switch arg {
 	case "delete":
