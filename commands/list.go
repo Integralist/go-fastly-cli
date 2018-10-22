@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 
 	"github.com/integralist/go-fastly-cli/common"
@@ -27,7 +26,7 @@ func List(f flags.Flags, client *fastly.Client) {
 		if err != nil {
 			fmt.Println("Sorry, we were unable to acquire the latest service version")
 			fmt.Println("Please try again, or provide a specific version by using the -version flag")
-			os.Exit(1)
+			common.Failure()
 		}
 	}
 
@@ -40,7 +39,7 @@ func List(f flags.Flags, client *fastly.Client) {
 		selectedVersion, err = strconv.Atoi(serviceVersion)
 		if err != nil {
 			fmt.Printf("Unable to convert provided version:\n\t%+v\n", err)
-			os.Exit(1)
+			common.Failure()
 		}
 	}
 
@@ -50,7 +49,7 @@ func List(f flags.Flags, client *fastly.Client) {
 	})
 	if err != nil {
 		fmt.Printf("Unable to retrieve list of VCL files for version: %s", common.Yellow(selectedVersion))
-		os.Exit(1)
+		common.Failure()
 	}
 
 	fmt.Printf("VCL files found for service version: %s\n\n", common.Yellow(selectedVersion))
@@ -58,5 +57,5 @@ func List(f flags.Flags, client *fastly.Client) {
 		fmt.Printf("  * %v\n", f.Name)
 	}
 
-	os.Exit(1)
+	common.Success()
 }

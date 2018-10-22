@@ -9,6 +9,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/integralist/go-fastly-cli/common"
 	"github.com/sirupsen/logrus"
 )
 
@@ -58,7 +59,7 @@ func (f Flags) Help() {
 
 	fmt.Printf("%sExamples:\n\n%s%s%s%s", divider, list, delete, diff, upload)
 
-	os.Exit(1)
+	common.Success()
 }
 
 // Check determines if a flag was specified before the subcommand

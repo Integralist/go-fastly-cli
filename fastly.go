@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/integralist/go-fastly-cli/commands"
+	"github.com/integralist/go-fastly-cli/common"
 	"github.com/integralist/go-fastly-cli/flags"
 	"github.com/integralist/go-fastly-cli/standalone"
 
@@ -14,7 +15,7 @@ import (
 )
 
 // appVersion is the application version
-const appVersion = "0.0.3"
+const appVersion = "0.0.4"
 
 var logger *logrus.Entry
 
@@ -33,112 +34,114 @@ func showHelp(f flags.Flags) bool {
 	return false
 }
 
-func success() {
-	os.Exit(0)
-}
-
-func failure() {
-	os.Exit(1)
-}
-
-func settings(version, service string, client *fastly.Client) {
+func showSettings(version, service string, client *fastly.Client) {
 	if version == "latest" {
 		standalone.PrintLatestSettings(service, client)
-		success()
+		common.Success()
 	}
 
 	if version != "" {
 		settingsVersion, err := strconv.Atoi(version)
 		if err != nil {
 			fmt.Println(err)
-			failure()
+			common.Failure()
 		}
 
 		standalone.PrintSettingsFor(service, settingsVersion, client)
-		success()
+		common.Success()
 	}
 }
 
 func main() {
 	f := flags.New()
 
-	if *f.Top.Debug == true {
+	activate := *f.Top.Activate
+	debug := *f.Top.Debug
+	service := *f.Top.Service
+	settings := *f.Top.Settings
+	status := *f.Top.Status
+	token := *f.Top.Token
+	validate := *f.Top.Validate
+	version := *f.Top.Version
+
+	if debug == true {
 		logrus.SetLevel(logrus.DebugLevel)
 	}
 	logger.Debug("flags initialised, application starting")
+
+	if version == true {
+		fmt.Println(appVersion)
+		return
+	}
 
 	if showHelp(f) {
 		f.Help()
 	}
 
-	if *f.Top.Version == true {
-		fmt.Println(appVersion)
-		os.Exit(1)
-	}
-
-	client, err := fastly.NewClient(*f.Top.Token)
+	client, err := fastly.NewClient(token)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		common.Failure()
 	}
 
-	if *f.Top.Activate != "" {
-		standalone.ActivateVersion(*f.Top.Activate, *f.Top.Service, client)
+	if activate != "" {
+		standalone.ActivateVersion(activate, service, client)
 		return
 	}
 
-	if *f.Top.Validate != "" {
-		standalone.ValidateVersion(*f.Top.Validate, *f.Top.Service, client)
+	if validate != "" {
+		standalone.ValidateVersion(validate, service, client)
 		return
 	}
 
-	if *f.Top.Status != "" && *f.Top.Status == "latest" {
-		status, err := standalone.GetLatestServiceVersionStatus(*f.Top.Service, client)
+	if status != "" && status == "latest" {
+		status, err := standalone.GetLatestServiceVersionStatus(service, client)
 		if err != nil {
 			fmt.Println(err)
-			os.Exit(1)
+			common.Failure()
 		}
 
 		fmt.Println(status)
 		return
 	}
 
-	if *f.Top.Status != "" {
-		statusVersion, err := strconv.Atoi(*f.Top.Status)
+	if status != "" {
+		statusVersion, err := strconv.Atoi(status)
 		if err != nil {
 			fmt.Println(err)
-			os.Exit(1)
+			common.Failure()
 		}
 
-		status, err := standalone.GetStatusForVersion(*f.Top.Service, statusVersion, client)
+		status, err := standalone.GetStatusForVersion(service, statusVersion, client)
 		if err != nil {
 			fmt.Println(err)
-			os.Exit(1)
+			common.Failure()
 		}
 		fmt.Println(status)
 		return
 	}
 
-	settings(*f.Top.Settings, *f.Top.Service, client)
+	showSettings(settings, service, client)
 
 	args := os.Args[1:] // strip first arg `fastly`
 	arg, counter := f.Check(args)
+	subset := args[counter:]
 
 	switch arg {
 	case "delete":
-		f.Top.Delete.Parse(args[counter:])
+		f.Top.Delete.Parse(subset)
 		commands.Delete(f, client)
 	case "diff":
-		f.Top.Diff.Parse(args[counter:])
+		f.Top.Diff.Parse(subset)
 		commands.Diff(f, client)
 	case "list":
-		f.Top.List.Parse(args[counter:])
+		f.Top.List.Parse(subset)
 		commands.List(f, client)
 	case "upload":
-		f.Top.Upload.Parse(args[counter:])
+		f.Top.Upload.Parse(subset)
 		commands.Upload(f, client)
 	default:
 		fmt.Printf("%v is not valid command.\n", arg)
-		os.Exit(1)
+		common.Failure()
 	}
 }

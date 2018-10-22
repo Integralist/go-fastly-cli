@@ -3,7 +3,6 @@ package commands
 import (
 	"fmt"
 	"io/ioutil"
-	"os"
 	"strconv"
 
 	"github.com/integralist/go-fastly-cli/common"
@@ -30,7 +29,7 @@ func Upload(f flags.Flags, client *fastly.Client) {
 	selectedVersion, err := acquireVersion(f, client)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		common.Failure()
 	}
 
 	processFiles(selectedVersion, uploadVCL, handleResponse, f, client)
@@ -39,7 +38,7 @@ func Upload(f flags.Flags, client *fastly.Client) {
 func checkIncorrectFlagConfiguration(f flags.Flags) {
 	if *f.Sub.CloneVersion != "" && *f.Sub.UploadVersion != "" {
 		fmt.Println("Please do not provide both -clone-version and -upload-version flags")
-		os.Exit(1)
+		common.Failure()
 	}
 }
 

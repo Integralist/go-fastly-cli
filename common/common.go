@@ -4,6 +4,7 @@ package common
 
 import (
 	"fmt"
+	"os"
 	"sort"
 
 	"github.com/fatih/color"
@@ -34,6 +35,16 @@ func (v wrappedVersions) Len() int      { return len(v) }
 func (v wrappedVersions) Swap(i, j int) { v[i], v[j] = v[j], v[i] }
 func (v wrappedVersions) Less(i, j int) bool {
 	return v[i].Number < v[j].Number
+}
+
+// Success stops processing and returns a zero exit code
+func Success() {
+	os.Exit(0)
+}
+
+// Failure stops processing and returns an error exit code
+func Failure() {
+	os.Exit(1)
 }
 
 // GetLatestVCLVersion returns latest fastly service version

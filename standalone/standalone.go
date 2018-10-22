@@ -5,7 +5,6 @@ package standalone
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 
 	"github.com/integralist/go-fastly-cli/common"
@@ -18,7 +17,7 @@ func ActivateVersion(version, service string, client *fastly.Client) {
 	v, err := strconv.Atoi(version)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		common.Failure()
 	}
 
 	_, err = client.ActivateVersion(&fastly.ActivateVersionInput{
@@ -27,7 +26,7 @@ func ActivateVersion(version, service string, client *fastly.Client) {
 	})
 	if err != nil {
 		fmt.Printf("\nThere was a problem activating version %s\n\n%s", common.Yellow(version), common.Red(err))
-		os.Exit(1)
+		common.Failure()
 	}
 
 	fmt.Printf("\nService '%s' now has version '%s' activated\n\n", common.Yellow(service), common.Green(version))
@@ -38,7 +37,7 @@ func ValidateVersion(version, service string, client *fastly.Client) {
 	v, err := strconv.Atoi(version)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		common.Failure()
 	}
 
 	valid, msg, err := client.ValidateVersion(&fastly.ValidateVersionInput{
@@ -47,7 +46,7 @@ func ValidateVersion(version, service string, client *fastly.Client) {
 	})
 	if err != nil {
 		fmt.Printf("\nThere was a problem validating version %s\n\n%s", common.Yellow(version), common.Red(err))
-		os.Exit(1)
+		common.Failure()
 	}
 
 	var validColour, details string
@@ -67,7 +66,7 @@ func PrintLatestSettings(serviceID string, client *fastly.Client) {
 	latestVersion, err := common.GetLatestVCLVersion(serviceID, client)
 	if err != nil {
 		fmt.Println(err)
-		os.Exit(1)
+		common.Failure()
 	}
 
 	PrintSettingsFor(serviceID, latestVersion, client)
@@ -81,7 +80,7 @@ func PrintSettingsFor(serviceID string, serviceVersion int, client *fastly.Clien
 	})
 	if err != nil {
 		fmt.Printf("\nThere was a problem getting the settings for version %s\n\n%s", common.Yellow(serviceVersion), common.Red(err))
-		os.Exit(1)
+		common.Failure()
 	}
 
 	fmt.Printf(

@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -31,13 +30,13 @@ func Diff(f flags.Flags, client *fastly.Client) {
 		selectedVersion, err = strconv.Atoi(*f.Sub.VclVersion)
 		if err != nil {
 			fmt.Println(err)
-			os.Exit(1)
+			common.Failure()
 		}
 	} else {
 		latestVersion, err := common.GetLatestVCLVersion(*f.Top.Service, client)
 		if err != nil {
 			fmt.Println(err)
-			os.Exit(1)
+			common.Failure()
 		}
 		selectedVersion = latestVersion
 	}

@@ -2,7 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"os"
 	"strconv"
 
 	"github.com/integralist/go-fastly-cli/common"
@@ -20,7 +19,7 @@ func Delete(f flags.Flags, client *fastly.Client) {
 
 	if deleteVCL == "" {
 		fmt.Println("You must provide a VCL name\n  e.g. -name test_file")
-		os.Exit(1)
+		common.Failure()
 	}
 
 	deleteVersion := *f.Sub.VclDeleteVersion
@@ -34,7 +33,7 @@ func Delete(f flags.Flags, client *fastly.Client) {
 		if err != nil {
 			fmt.Println("Sorry, we were unable to acquire the latest service version")
 			fmt.Println("Please try again, or provide a specific version by using the -version flag")
-			os.Exit(1)
+			common.Failure()
 		}
 	}
 
@@ -47,7 +46,7 @@ func Delete(f flags.Flags, client *fastly.Client) {
 		selectedVersion, err = strconv.Atoi(serviceVersion)
 		if err != nil {
 			fmt.Printf("Unable to convert provided version:\n\t%+v\n", err)
-			os.Exit(1)
+			common.Failure()
 		}
 	}
 
@@ -62,5 +61,5 @@ func Delete(f flags.Flags, client *fastly.Client) {
 		fmt.Printf("Error:\n%s", common.Red(err))
 	}
 
-	os.Exit(1)
+	common.Success()
 }
