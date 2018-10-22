@@ -52,6 +52,35 @@ func showSettings(version, service string, client *fastly.Client) {
 	}
 }
 
+func handleStatus(status, service string, client *fastly.Client) {
+	if status != "" && status == "latest" {
+		status, err := standalone.GetLatestServiceVersionStatus(service, client)
+		if err != nil {
+			fmt.Println(err)
+			common.Failure()
+		}
+
+		fmt.Println(status)
+		common.Success()
+	}
+
+	if status != "" {
+		statusVersion, err := strconv.Atoi(status)
+		if err != nil {
+			fmt.Println(err)
+			common.Failure()
+		}
+
+		status, err := standalone.GetStatusForVersion(service, statusVersion, client)
+		if err != nil {
+			fmt.Println(err)
+			common.Failure()
+		}
+
+		fmt.Println(status)
+	}
+}
+
 func main() {
 	f := flags.New()
 
@@ -94,33 +123,7 @@ func main() {
 		return
 	}
 
-	if status != "" && status == "latest" {
-		status, err := standalone.GetLatestServiceVersionStatus(service, client)
-		if err != nil {
-			fmt.Println(err)
-			common.Failure()
-		}
-
-		fmt.Println(status)
-		return
-	}
-
-	if status != "" {
-		statusVersion, err := strconv.Atoi(status)
-		if err != nil {
-			fmt.Println(err)
-			common.Failure()
-		}
-
-		status, err := standalone.GetStatusForVersion(service, statusVersion, client)
-		if err != nil {
-			fmt.Println(err)
-			common.Failure()
-		}
-		fmt.Println(status)
-		return
-	}
-
+	handleStatus(status, service, client)
 	showSettings(settings, service, client)
 
 	args := os.Args[1:] // strip first arg `fastly`
