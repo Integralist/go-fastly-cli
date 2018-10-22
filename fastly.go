@@ -33,9 +33,38 @@ func showHelp(f flags.Flags) bool {
 	return false
 }
 
+func success() {
+	os.Exit(0)
+}
+
+func failure() {
+	os.Exit(1)
+}
+
+func settings(version, service string, client *fastly.Client) {
+	if version == "latest" {
+		standalone.PrintLatestSettings(service, client)
+		success()
+	}
+
+	if version != "" {
+		settingsVersion, err := strconv.Atoi(version)
+		if err != nil {
+			fmt.Println(err)
+			failure()
+		}
+
+		standalone.PrintSettingsFor(service, settingsVersion, client)
+		success()
+	}
+}
+
 func main() {
 	f := flags.New()
 
+	if *f.Top.Debug == true {
+		logrus.SetLevel(logrus.DebugLevel)
+	}
 	logger.Debug("flags initialised, application starting")
 
 	if showHelp(f) {
@@ -45,10 +74,6 @@ func main() {
 	if *f.Top.Version == true {
 		fmt.Println(appVersion)
 		os.Exit(1)
-	}
-
-	if *f.Top.Debug == true {
-		logrus.SetLevel(logrus.DebugLevel)
 	}
 
 	client, err := fastly.NewClient(*f.Top.Token)
@@ -94,21 +119,7 @@ func main() {
 		return
 	}
 
-	if *f.Top.Settings == "latest" {
-		standalone.PrintLatestSettings(*f.Top.Service, client)
-		return
-	}
-
-	if *f.Top.Settings != "" {
-		settingsVersion, err := strconv.Atoi(*f.Top.Settings)
-		if err != nil {
-			fmt.Println(err)
-			os.Exit(1)
-		}
-
-		standalone.PrintSettingsFor(*f.Top.Service, settingsVersion, client)
-		return
-	}
+	settings(*f.Top.Settings, *f.Top.Service, client)
 
 	args := os.Args[1:] // strip first arg `fastly`
 	arg, counter := f.Check(args)
