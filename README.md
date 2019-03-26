@@ -120,6 +120,20 @@ Below is a list of environment variables this tool supports:
 
 > Use the relevant CLI flags to override these values
 
+You can quickly view the relevant environment variables in your current shell using the following bash command:
+
+```bash
+env | sort | grep -iE '(vcl|fastly)'
+
+FASTLY_API_TOKEN=123
+FASTLY_SERVICE_ID=456
+VCL_DIRECTORY=/Users/integralist/code/organization/cdn
+VCL_MATCH_PATH=stage|www
+VCL_SKIP_PATH=utils
+```
+
+In the above output we can see that the files I'll upload will be only those that are located in either a `stage` or `www` sub directory of my repository (which is found at `VCL_DIRECTORY`). I'll also skip uploading any files stored in the `utils` sub directory.
+
 ## Examples
 
 > Note: all examples presume `FASTLY_API_TOKEN`/`FASTLY_SERVICE_ID` env vars set
