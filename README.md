@@ -227,6 +227,7 @@ make clean
 
 ## TODO
 
+* Ability to purge URLs (both individual and those associated by surrogate keys)
 * Ability to 'dry run' a command (to see what files are affected, e.g. what files will be uploaded and where)
 * Ability to diff two remote services (not just local against a remote)
 * Ability to upload individual files (not just pattern matched list of files)
