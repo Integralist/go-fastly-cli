@@ -10,12 +10,12 @@ import (
 	"github.com/integralist/go-fastly-cli/flags"
 	"github.com/integralist/go-fastly-cli/standalone"
 
-	fastly "github.com/sethvargo/go-fastly"
+	"github.com/sethvargo/go-fastly/fastly"
 	"github.com/sirupsen/logrus"
 )
 
 // appVersion is the application version
-const appVersion = "0.0.4"
+const appVersion = "0.0.5"
 
 var logger *logrus.Entry
 

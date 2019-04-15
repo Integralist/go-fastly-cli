@@ -6,8 +6,7 @@ import (
 
 	"github.com/integralist/go-fastly-cli/common"
 	"github.com/integralist/go-fastly-cli/flags"
-
-	fastly "github.com/sethvargo/go-fastly"
+	"github.com/sethvargo/go-fastly/fastly"
 )
 
 // List all VCL files found in the remote service version

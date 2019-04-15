@@ -8,7 +8,7 @@ import (
 	"sort"
 
 	"github.com/fatih/color"
-	fastly "github.com/sethvargo/go-fastly"
+	"github.com/sethvargo/go-fastly/fastly"
 )
 
 // useful colour settings for printing messages...

@@ -8,8 +8,7 @@ import (
 	"strconv"
 
 	"github.com/integralist/go-fastly-cli/common"
-
-	fastly "github.com/sethvargo/go-fastly"
+	"github.com/sethvargo/go-fastly/fastly"
 )
 
 // ActivateVersion activates the specified Fastly service version
