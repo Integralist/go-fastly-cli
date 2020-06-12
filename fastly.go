@@ -15,7 +15,7 @@ import (
 )
 
 // appVersion is the application version
-const appVersion = "0.0.5"
+const appVersion = "0.0.6"
 
 var logger *logrus.Entry
 

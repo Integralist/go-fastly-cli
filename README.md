@@ -21,16 +21,16 @@ go get github.com/integralist/go-fastly-cli
 ## Usage
 
 ```bash
-fastly <flags> [diff <options>]
-fastly <flags> [upload <options>]
-fastly <flags> [list <options>]
-fastly <flags> [delete <options>]
+fastcli <flags> [diff <options>]
+fastcli <flags> [upload <options>]
+fastcli <flags> [list <options>]
+fastcli <flags> [delete <options>]
 ```
 
 Flags:
 
 ```bash
-fastly -help
+fastcli -help
 
   -activate string
         specify Fastly service version to activate
@@ -61,7 +61,7 @@ fastly -help
 Diff Options:
 
 ```bash
-fastly diff -help
+fastcli diff -help
 
 Usage of diff:
   -version string
@@ -71,7 +71,7 @@ Usage of diff:
 Upload Options:
 
 ```bash
-fastly upload -help
+fastcli upload -help
 
 Usage of upload:
   -clone string
@@ -85,7 +85,7 @@ Usage of upload:
 List Options:
 
 ```bash
-fastly list -help
+fastcli list -help
 
 Usage of list:
   -version string
@@ -95,7 +95,7 @@ Usage of list:
 Delete Options:
 
 ```bash
-fastly delete -help
+fastcli delete -help
 
 Usage of delete:
   -name string
@@ -140,63 +140,63 @@ In the above output we can see that the files I'll upload will be only those tha
 
 ```bash
 # view status for the latest service version
-fastly -status latest
+fastcli -status latest
 
 # view status for the specified service version
-fastly -status 123
+fastcli -status 123
 
 # view settings for the latest service version
-fastly -settings latest
+fastcli -settings latest
 
 # view settings for the specified service version
-fastly -settings 123
+fastcli -settings 123
 
 # validate specified service version
-fastly -validate 123
+fastcli -validate 123
 
 # activate specified service version
-fastly -activate 123
+fastcli -activate 123
 
 # view latest version of remote service vcl files
-fastly list
+fastcli list
 
 # view version 123 of remote service vcl files
-fastly list -version 123
+fastcli list -version 123
 
 # delete specified vcl file from latest version of remote service
-fastly delete -name test_file
+fastcli delete -name test_file
 
 # delete specified vcl file from specific version of remote service
-fastly delete -name test_file -version 123
+fastcli delete -name test_file -version 123
 
 # diff local vcl files against the lastest remote versions
-fastly diff
+fastcli diff
 
 # diff local vcl files against the specific remote versions
-fastly diff -version 123
+fastcli diff -version 123
 
 # enable debug mode
 # this will mean debug logs are displayed
 # for 'diff' subcommand: also display per file diff
-fastly -debug diff -version 123
+fastcli -debug diff -version 123
 
 # upload local files to remote service version
-fastly upload -version 123
+fastcli upload -version 123
 
 # token and service explicitly set to override env vars
-fastly -service xxx -token xxx upload -version 123
+fastcli -service xxx -token xxx upload -version 123
 
 # modify VCL directory temporarily + use different token/service id
-VCL_MATCH_PATH=foo fastly -token $FASTLY_API_TOKEN_FOO -service $FASTLY_SERVICE_ID_FOO diff
+VCL_MATCH_PATH=foo fastcli -token $FASTLY_API_TOKEN_FOO -service $FASTLY_SERVICE_ID_FOO diff
 
 # clone specified service version and upload local files to it
-fastly upload -clone 123
+fastcli upload -clone 123
 
 # upload local files to the latest remote service version
-fastly upload -latest
+fastcli upload -latest
 
 # clone latest service version available and upload local files to it
-fastly upload
+fastcli upload
 ```
 
 ## Makefile

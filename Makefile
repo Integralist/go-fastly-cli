@@ -1,4 +1,4 @@
-bin := "/usr/local/bin/fastly"
+bin := "/usr/local/bin/fastcli"
 vim_dir := "./.vim"
 vimrc := "./.vimrc"
 container_env := "go-container-with-vim"
