@@ -1,5 +1,7 @@
 # go-fastly-cli
 
+> **Note**: this project was hacked together many years ago to solve a specific problem I had. It works perfectly for me but if you're reviewing the code to see how it is put together, then just remember that A.) the code _quality_ isn't as good as it probably could be, and B.) the code _design_ equally could be greatly improved. Otherwise have fun with it.
+
 CLI tool for:
 
 * Uploading local VCL to Fastly.
